@@ -4,7 +4,10 @@
     <title>My Parse App</title>
     <meta name="description" content="My Parse App">
     <meta name="viewport" content="width=device-width">
+    <link href='https://fonts.googleapis.com/css?family=Dancing+Script' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Marck+Script&subset=latin,cyrillic' rel='stylesheet' type='text/css'>
     <link media="all" rel="stylesheet" type="text/css" href="css/all.css" />
+
 
 </head>
 
@@ -18,46 +21,78 @@
 
 
 <!----------------Templates--------------->
+
 <script type="text/template" id="form-template">
     <form id="add-task">
-        <input type="text" required placeholder="new task" class="task">
-        <input type="submit" value="Add">
+        <input type="text" required placeholder="New task" class="task">
+        <input type="submit" value="Add new task">
     </form>
 </script>
+
 
 <script type="text/template" id="task-template">
     <input class="status-toggle" type="checkbox" <%= isComplete ? 'checked="checked"' : ''%>>
     <span><%= title %></span>
-    <button class="edit">Edit</button>
+    <button class="edit" ">Edit</button>
     <button class="delete">Delete</button>
 </script>
 
+
 <script type="text/template" id="edit-template">
     <input class="status-toggle" type="checkbox" <%= isComplete ? 'checked="checked"' : ''%>>
-    <input type='text' value=" <%= title %>" >
+    <input type='text' class='item' value=" <%= title %>" >
     <button class="save">Save</button>
-    <button class="cansel">Cancel</button>
+    <button class="edit-cancel">Cancel</button>
 </script>
+
 
 <script type="text/template" id="login-template">
     <form id="login-form">
-        <input type="text" required placeholder="login" class="login">
-        <input type="password" required placeholder="password" class="password">
-        <input type="submit" value="LogIn" class="'btn-login">
+        <div class="row">
+            <input type="text" required placeholder="Login" class="login">
+        </div>
+        <div class="row">
+            <input type="password" required placeholder="Password" class="password">
+        </div>
+        <div class="row">
+            <input type="submit" value="LogIn" class="btn-login btn-style">
+        </div>
     </form>
-    <button class="signUp">SignUp</button>
+    <button class="signUp btn-style">SignUp</button>
 </script>
+
+
 
 <script type="text/template" id="signUp-template">
     <h3>Sign Up</h3>
     <form id="signUp-form">
-        <input type="text" required placeholder="login" class="login">
-        <input type="password" required placeholder="password" class="password">
-        <input type="email"  placeholder="email" class="email">
-        <input type="submit" value="SignUp" class="'btn-signup">
+        <div class="row">
+            <input type="text"  placeholder="Login" class="login">
+        </div>
+        <div class="row">
+            <input type="password"  placeholder="Password" class="password">
+        </div>
+        <div class="row">
+            <input type="email"  placeholder="Email" class="email">
+        </div>
+        <div class="row">
+            <input type="submit" value="SignUp" class="btn-signup btn-style">
+        </div>
+        <div class="row">
+            <button class="signup-cancel btn-style">Cancel</button>
+        </div>
     </form>
 
 </script>
+
+<script type="text/template" id="successSignUp-template">
+    <p>Thank you! Registration was successful!</p>
+    <div class="row">
+        <button class="btn-login btn-style">LogIn</button>
+    </div>
+
+</script>
+
 
 
 <script type="text/template" id="logout-template">

@@ -1,36 +1,52 @@
-.wrapper{
-    width: 400px;
+body{
+    margin: 0;
+    font-family:'Dancing Script', cursive, 'Marck Script', cursive;
+    font-size: 20px;
+}
+
+* {
+    box-sizing: border-box;
+}
+.wrapper, .signUp-mode {
+    width: 500px;
     margin: 20px auto;
-    padding: 20px 50px 50px;
-    background: #e9f7fa;
-    border: 1px solid #a9e0eb;
-    box-shadow: 0 0 5px #a9e0eb;
+    padding: 60px 20px 60px 60px;
+    background-image: url("todo-bg.jpg");
+    border: 1px solid lightgrey;
+    box-shadow: 0 0 5px grey;
 }
 .complete span{
     text-decoration: line-through;
 }
 .error{
     color: red;
-    font-size: 12px;
-    line-height: 10px;
 }
+
 .signUp-mode {
     position: fixed;
-    top:30%;
-    left: 30%;
-    background-color: #faf2cc;
-    border: #c0a16b 1px solid;
-    padding: 50px;
-    box-shadow: 0 0 5px #c0a16b;
+    top:140px;
+    left: 50%;
+    margin-left: -200px;
+    z-index: 3;
 }
 
 form{
     margin: 10px 0;
 }
- .login, .password, .email, .btn-signup, .btn-login{
-    display: block;
-    margin-bottom: 10px;
-    width: 200px;
+
+input, button{
+    font-family:'Dancing Script', cursive, 'Marck Script', cursive;
+    font-size: 18px;
+    padding-left: 5px;
+}
+
+ .login, .password, .email,.btn-style{
+     display: block;
+     width: 200px;
+}
+
+.row{
+    margin-bottom: 15px;
 }
 
 #tasks-list .edit,

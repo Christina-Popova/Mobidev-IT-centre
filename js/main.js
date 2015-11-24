@@ -23,6 +23,22 @@
         return _.template($('#' + id).html());
     };
 
+    App.Helper.lockScreen = function() {
+        $("body").prepend("<div class='overlay'></div>");
+        $(".overlay").css({
+            "position": "absolute",
+            "width": $(document).width(),
+            "height": $(document).height(),
+            "z-index": 2,
+            "background-color": "grey",
+            "opacity": 0
+
+        }).hide().fadeIn();
+    };
+    App.Helper.unlockScreen = function() {
+        $("body").find('.overlay').remove();
+    };
+
     App.vent = _.extend({}, Parse.Events);
 
 
@@ -91,7 +107,7 @@
             'click .edit': 'edit',
             'click .delete': 'destroy',
             'click .save': 'save',
-            'click .cansel': 'cancel'
+            'click .edit-cancel': 'cancel',
         },
 
         showErrors: function(model, error) {
@@ -99,7 +115,8 @@
         },
 
         hideErrors: function(){
-            this.$el.find('.error').text('');
+            this.$el.find('.error').remove();
+            console.log('hide!!!!!')
         },
 
         render: function() {
@@ -183,7 +200,6 @@
 
         render: function() {
             this.clear();
-            console.log(this.user);
             if(!this.user){
                 return this;
             }
@@ -254,7 +270,11 @@
         template: App.Helper.template('signUp-template'),
 
         events: {
-            'submit': 'signUp'
+            'submit': 'signUp',
+            'click .signup-cancel': 'cancel',
+            'click .btn-login': 'login',
+            'blur input': 'hideErrors'
+
         },
 
         render: function (){
@@ -265,22 +285,31 @@
 
         signUp: function(e) {
             e.preventDefault();
-            this.hideErrors();
 
-            var user = new Parse.User();
-            user.set({
+            this.user = new Parse.User();
+            this.user.set({
                 username: this.$el.find("#signUp-form").find('.login').val(),
                 password: this.$el.find("#signUp-form").find('.password').val()});
 
-            user.signUp(null, {
+            this.user.signUp(null, {
                 success: function (){
-                    alert('Resgistration success!');
-                    this.$el.remove();
-                    Parse.User.logOut();
+                    this.template = App.Helper.template('successSignUp-template');
+                    this.render();
                 }.bind(this),
                 error:   this.showError.bind(this)
             });
 
+        },
+
+        login: function(){
+            this.cancel();
+            console.log('login!!!!');
+            App.vent.trigger('login', this.user);
+        },
+
+        cancel: function (){
+            App.Helper.unlockScreen();
+            this.$el.remove();
         },
 
         showError: function(user, error){
@@ -288,7 +317,7 @@
         },
 
         hideErrors: function(){
-            this.$el.find('.error').text('');
+            this.$el.find('.error').remove();
         }
     });
 
@@ -307,11 +336,10 @@
         },
 
         initialize: function () {
-            App.vent.on('login', this.render, this);
-            App.vent.on('logout', this.render, this);
+            App.vent.on('login', this.successLogin, this);
 
             if(Parse.User.current()){
-                this.successLogin(Parse.User.current());
+                App.vent.trigger('login', Parse.User.current());
             } else this.render();
         },
 
@@ -331,21 +359,21 @@
             Parse.User.logIn(login, password, {
                 success: function (){
                     var user = Parse.User.current();
-                    this.successLogin(user);
+                    App.vent.trigger('login', user);
                 }.bind(this),
                 error:   this.showError.bind(this)
             });
         },
 
         signUp: function(e) {
-            //lockScreen();
+            App.Helper.lockScreen();
             var signUp = new App.Views.SignUp ();
             $(".wrapper").append(signUp.render().el);
         },
 
-        successLogin: function(user){
+        successLogin: function(){
             this.template = App.Helper.template('logout-template');
-            App.vent.trigger('login', user);
+            this.render();
         },
 
         showError: function(user, error){
@@ -353,16 +381,17 @@
         },
 
         hideErrors: function(){
-            this.$el.find('.error').text('');
+            this.$el.find('.error').remove();
         },
 
         logOut: function(){
             Parse.User.logOut();
-            this.template = App.Helper.template('login-template');
             App.vent.trigger('logout');
+
+            this.template = App.Helper.template('login-template');
+            this.render();
         }
     });
-
 
 
     //__________________________________________
