@@ -368,7 +368,7 @@
         signUp: function(e) {
             App.Helper.lockScreen();
             var signUp = new App.Views.SignUp ();
-            $(".wrapper").append(signUp.render().el);
+            $(".container").append(signUp.render().el);
         },
 
         successLogin: function(){
@@ -402,10 +402,10 @@
     var taskListView = new App.Views.TaskListView({collection: taskList});
     var addNewTaskView = new App.Views.AddNewTask();
 
-    $('.wrapper').append(addNewTaskView.render().el);
-    $('.wrapper').append(taskListView.render().el);
+    $('.container').append(addNewTaskView.render().el);
+    $('.container').append(taskListView.render().el);
 
     var loginForm = new App.Views.LogInOutForm();
-    $('.wrapper').append(loginForm.el);
+    $('.container').append(loginForm.el);
 
 })();

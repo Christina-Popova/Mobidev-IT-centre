@@ -1,16 +1,28 @@
-body{
-    margin: 0;
-    font-family:'Dancing Script', cursive, 'Marck Script', cursive;
-    font-size: 20px;
-}
-
 * {
     box-sizing: border-box;
 }
+
+body{
+    margin: 0;
+    /*font-family:'Dancing Script', cursive, 'Marck Script', cursive;*/
+    font-family: 'Marck Script', cursive;
+    font-size: 20px;
+}
+
+form{
+    margin: 10px 0;
+}
+
+input, button{
+    font-family: 'Marck Script', cursive;
+    font-size: 18px;
+    padding-left: 5px;
+}
+
 .wrapper, .signUp-mode {
     width: 500px;
     margin: 20px auto;
-    padding: 60px 20px 60px 60px;
+    padding: 30px 20px 20px 60px;
     background-image: url("todo-bg.jpg");
     border: 1px solid lightgrey;
     box-shadow: 0 0 5px grey;
@@ -24,20 +36,10 @@ body{
 
 .signUp-mode {
     position: fixed;
-    top:140px;
+    top:100px;
     left: 50%;
     margin-left: -200px;
     z-index: 3;
-}
-
-form{
-    margin: 10px 0;
-}
-
-input, button{
-    font-family:'Dancing Script', cursive, 'Marck Script', cursive;
-    font-size: 18px;
-    padding-left: 5px;
 }
 
  .login, .password, .email,.btn-style{
@@ -47,6 +49,18 @@ input, button{
 
 .row{
     margin-bottom: 15px;
+}
+.copyright {
+    font-size: 12px;
+    margin-top: 50px;
+    text-align: center;
+    overflow: hidden;
+  }
+.copyright span{
+    float: left;
+}
+.copyright span+span{
+    float: right;
 }
 
 #tasks-list .edit,
