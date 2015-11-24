@@ -1,0 +1,53 @@
+.wrapper{
+    width: 400px;
+    margin: 20px auto;
+    padding: 20px 50px 50px;
+    background: #e9f7fa;
+    border: 1px solid #a9e0eb;
+    box-shadow: 0 0 5px #a9e0eb;
+}
+.complete span{
+    text-decoration: line-through;
+}
+.error{
+    color: red;
+    font-size: 12px;
+    line-height: 10px;
+}
+.signUp-mode {
+    position: fixed;
+    top:30%;
+    left: 30%;
+    background-color: #faf2cc;
+    border: #c0a16b 1px solid;
+    padding: 50px;
+    box-shadow: 0 0 5px #c0a16b;
+}
+
+form{
+    margin: 10px 0;
+}
+ .login, .password, .email, .btn-signup, .btn-login{
+    display: block;
+    margin-bottom: 10px;
+    width: 200px;
+}
+
+#tasks-list .edit,
+#tasks-list .delete{
+    display:none;
+}
+#tasks-list li {
+    line-height: 30px;
+}
+#tasks-list li:hover button {
+    display:inline;
+}
+#tasks-list li.complete:hover .edit {
+    display:none;
+}
+#logout-block{
+    text-align: right;
+}
+
+

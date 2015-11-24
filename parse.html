@@ -1,0 +1,81 @@
+<!doctype html>
+<head>
+    <meta charset="utf-8">
+    <title>My Parse App</title>
+    <meta name="description" content="My Parse App">
+    <meta name="viewport" content="width=device-width">
+    <link media="all" rel="stylesheet" type="text/css" href="css/all.css" />
+
+</head>
+
+<body>
+
+
+
+<div class="wrapper">
+    <h1>To do list</h1>
+</div>
+
+
+<!----------------Templates--------------->
+<script type="text/template" id="form-template">
+    <form id="add-task">
+        <input type="text" required placeholder="new task" class="task">
+        <input type="submit" value="Add">
+    </form>
+</script>
+
+<script type="text/template" id="task-template">
+    <input class="status-toggle" type="checkbox" <%= isComplete ? 'checked="checked"' : ''%>>
+    <span><%= title %></span>
+    <button class="edit">Edit</button>
+    <button class="delete">Delete</button>
+</script>
+
+<script type="text/template" id="edit-template">
+    <input class="status-toggle" type="checkbox" <%= isComplete ? 'checked="checked"' : ''%>>
+    <input type='text' value=" <%= title %>" >
+    <button class="save">Save</button>
+    <button class="cansel">Cancel</button>
+</script>
+
+<script type="text/template" id="login-template">
+    <form id="login-form">
+        <input type="text" required placeholder="login" class="login">
+        <input type="password" required placeholder="password" class="password">
+        <input type="submit" value="LogIn" class="'btn-login">
+    </form>
+    <button class="signUp">SignUp</button>
+</script>
+
+<script type="text/template" id="signUp-template">
+    <h3>Sign Up</h3>
+    <form id="signUp-form">
+        <input type="text" required placeholder="login" class="login">
+        <input type="password" required placeholder="password" class="password">
+        <input type="email"  placeholder="email" class="email">
+        <input type="submit" value="SignUp" class="'btn-signup">
+    </form>
+
+</script>
+
+
+<script type="text/template" id="logout-template">
+    <div id="logout-block">
+        <span>Signed in as <strong> <%= Parse.User.current().escape("username")%> </strong></span>
+        <button class="logOut">LogOut</button>
+    </div>
+</script>
+
+
+
+
+<script type="text/javascript" src="js/jquery.js"></script>
+<script type="text/javascript" src="js/underscore.js"></script>
+<!--<script type="text/javascript" src="js/backbone.js"></script>-->
+<script type="text/javascript" src="js/parse.js"></script>
+<script type="text/javascript" src="js/main.js"></script>
+
+</body>
+
+</html>
