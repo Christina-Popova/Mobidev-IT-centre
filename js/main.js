@@ -31,7 +31,7 @@
             "height": $(document).height(),
             "z-index": 2,
             "background-color": "grey",
-            "opacity": 0
+            "opacity": 0.4
 
         }).hide().fadeIn();
     };
@@ -57,7 +57,7 @@
         },
 
         toggleStatus: function() {
-            this.get('isComplete') ? this.set('isComplete', false) : this.set('isComplete', true);
+            this.set('isComplete', !this.get('isComplete'));
             this.save();
         }
     });
@@ -71,7 +71,7 @@
         model: App.Models.Task,
         initialize: function() {
             App.vent.on('addNewTask', this.addTask, this);
-            //App.vent.on('logout', this.reset, this);
+            App.vent.on('logout', this.reset, this);
             App.vent.on('login', this.setUser, this);
         },
 
@@ -80,9 +80,8 @@
         },
 
         addTask: function(task){
-            var task = new App.Models.Task(task);
-            task.set({user: this.user});
-            this.add(task);
+            task = new App.Models.Task(task);
+            this.add( task.set({user: this.user}));
             task.save();
         }
     });
@@ -110,19 +109,18 @@
             'click .edit-cancel': 'cancel',
         },
 
+        render: function() {
+            this.$el.html(this.template(this.model.toJSON()));
+            this.showStatus();
+            return this;
+        },
+
         showErrors: function(model, error) {
             this.$el.append("<div class='error'>"+ error + "</div>");
         },
 
         hideErrors: function(){
             this.$el.find('.error').remove();
-            console.log('hide!!!!!')
-        },
-
-        render: function() {
-            this.$el.html(this.template(this.model.toJSON()));
-            this.showStatus();
-            return this;
         },
 
         toggleStatus: function() {
@@ -172,41 +170,32 @@
         id: 'tasks-list',
 
         initialize: function() {
-            this.$el.hide();
             this.collection.on('add', this.addOne, this);
             App.vent.on('login', this.login, this);
             App.vent.on('logout', this.logout, this);
         },
 
         login: function(user){
-            this.user = user;
-            this.collection.reset();
-            this.render();
-            this.toggle();
-
+            this.render(user);
+            this.$el.show();
         },
 
-        logout: function(user){
-            this.toggle();
-        },
-
-        toggle:function(){
-            this.$el.toggle();
+        logout: function(){
+            this.$el.hide();
         },
 
         clear: function (){
             this.$el.empty();
         },
 
-        render: function() {
-            this.clear();
-            if(!this.user){
+        render: function(user) {
+            if(!user){
                 return this;
             }
 
+            this.clear();
             var query = new Parse.Query(App.Models.Task);
-            query.equalTo('user', this.user);
-
+            query.equalTo('user', user);
             query.find({
                 success: function(results) {
                     _.each(results, function(value, key) {
@@ -219,7 +208,7 @@
 
         addOne: function(task) {
             var taskList = new App.Views.TaskView({ model: task });
-            this.$el.append(taskList.render().el);
+            this.$el.prepend(taskList.render().el);
         }
 
     });
@@ -233,12 +222,8 @@
 
         initialize: function() {
             this.$el.hide();
-            App.vent.on('login', this.toggle, this);
-            App.vent.on('logout', this.toggle, this);
-        },
-
-        toggle:function(){
-            this.$el.toggle();
+            App.vent.on('login', this.toggleShow, this);
+            App.vent.on('logout', this.toggleShow, this);
         },
 
         events: {
@@ -250,15 +235,19 @@
             return this;
         },
 
-        clear: function (){
-            this.$el.find('.task').val("");
-        },
-
         submit: function(e) {
             e.preventDefault();
             var task = {title: this.$el.find('.task').val()};
             App.vent.trigger('addNewTask', task);
             this.clear();
+        },
+
+        toggleShow:function(){
+            this.$el.toggle();
+        },
+
+        clear: function (){
+            this.$el.find('.task').val("");
         }
 
     });
@@ -274,7 +263,6 @@
             'click .signup-cancel': 'cancel',
             'click .btn-login': 'login',
             'blur input': 'hideErrors'
-
         },
 
         render: function (){
@@ -285,12 +273,11 @@
 
         signUp: function(e) {
             e.preventDefault();
-
             this.user = new Parse.User();
             this.user.set({
                 username: this.$el.find("#signUp-form").find('.login').val(),
-                password: this.$el.find("#signUp-form").find('.password').val()});
-
+                password: this.$el.find("#signUp-form").find('.password').val()
+            });
             this.user.signUp(null, {
                 success: function (){
                     this.template = App.Helper.template('successSignUp-template');
@@ -298,12 +285,10 @@
                 }.bind(this),
                 error:   this.showError.bind(this)
             });
-
         },
 
         login: function(){
             this.cancel();
-            console.log('login!!!!');
             App.vent.trigger('login', this.user);
         },
 
@@ -348,7 +333,6 @@
             return this;
         },
 
-
         login: function(e) {
             e.preventDefault();
             this.hideErrors();
@@ -358,8 +342,7 @@
 
             Parse.User.logIn(login, password, {
                 success: function (){
-                    var user = Parse.User.current();
-                    App.vent.trigger('login', user);
+                    App.vent.trigger('login', Parse.User.current());
                 }.bind(this),
                 error:   this.showError.bind(this)
             });
@@ -369,6 +352,15 @@
             App.Helper.lockScreen();
             var signUp = new App.Views.SignUp ();
             $(".container").append(signUp.render().el);
+        },
+
+        logOut: function(){
+            Parse.User.logOut();
+            App.vent.trigger('logout');
+
+            this.template = App.Helper.template('login-template');
+            this.render();
+
         },
 
         successLogin: function(){
@@ -382,15 +374,8 @@
 
         hideErrors: function(){
             this.$el.find('.error').remove();
-        },
-
-        logOut: function(){
-            Parse.User.logOut();
-            App.vent.trigger('logout');
-
-            this.template = App.Helper.template('login-template');
-            this.render();
         }
+
     });
 
 

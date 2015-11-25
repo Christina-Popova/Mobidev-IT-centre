@@ -8,9 +8,17 @@ body{
     font-family: 'Marck Script', cursive;
     font-size: 20px;
 }
+p{
+    padding:50px 0 ;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
 
 form{
-    margin: 10px 0;
+    padding: 10px 0;
 }
 
 input, button{
@@ -19,9 +27,14 @@ input, button{
     padding-left: 5px;
 }
 
+.main{
+    box-sizing: content-box;
+    padding: 50px;
+}
+
 .wrapper, .signUp-mode {
     width: 500px;
-    margin: 20px auto;
+    margin: 0 auto;
     padding: 30px 20px 20px 60px;
     background-image: url("todo-bg.jpg");
     border: 1px solid lightgrey;
@@ -68,8 +81,7 @@ input, button{
     float: right;
 }
 
-#tasks-list .edit,
-#tasks-list .delete{
+#tasks-list button{
     display:none;
 }
 #tasks-list li {
