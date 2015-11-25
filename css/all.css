@@ -90,9 +90,15 @@ input, button{
 #tasks-list li:hover button {
     display:inline;
 }
-#tasks-list li.complete:hover .edit {
+#tasks-list li.complete:hover .edit,
+#tasks-list li.complete:hover .share{
     display:none;
 }
+{
+    display:none;
+}
+
+
 #logout-block{
     text-align: right;
 }

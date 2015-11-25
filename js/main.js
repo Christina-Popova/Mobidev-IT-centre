@@ -43,6 +43,7 @@
 
 
 
+
     //_______________________Models_____________________
 
     App.Models.Task =  Parse.Object.extend("Task", {
@@ -81,8 +82,15 @@
 
         addTask: function(task){
             task = new App.Models.Task(task);
-            this.add( task.set({user: this.user}));
-            task.save();
+            if(!task.isValid()){
+                return;
+            }
+            task.set({user: this.user});
+            task.save(null, {
+                success: function (){
+                    this.add(task);
+                }.bind(this),
+            });
         }
     });
 
@@ -107,6 +115,7 @@
             'click .delete': 'destroy',
             'click .save': 'save',
             'click .edit-cancel': 'cancel',
+            'click .share': 'share'
         },
 
         render: function() {
@@ -158,6 +167,22 @@
 
         remove: function() {
             this.$el.remove();
+        },
+
+        share: function () {
+            var shareEmail = prompt('Кого добавим?');
+
+            var query = new Parse.Query(Parse.User);
+            query.equalTo('email', shareEmail);
+            query.find({
+                success: function(results) {
+                    _.each(results, function(user) {
+                        this.model.addUnique('share', user.id)
+                        this.model.save();
+                    }, this);
+                }.bind(this)
+            });
+
         }
 
     });
@@ -276,7 +301,8 @@
             this.user = new Parse.User();
             this.user.set({
                 username: this.$el.find("#signUp-form").find('.login').val(),
-                password: this.$el.find("#signUp-form").find('.password').val()
+                password: this.$el.find("#signUp-form").find('.password').val(),
+                email: this.$el.find("#signUp-form").find('.email').val()
             });
             this.user.signUp(null, {
                 success: function (){
