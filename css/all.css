@@ -75,7 +75,7 @@ input, button{
 }
 
 .task{
-   width: 380px;
+   width: 375px;
 }
 
 .row{
@@ -115,19 +115,17 @@ input, button{
     float: left;
 }
 .align-left {
-    width: 345px
+    width: 315px
 }
 
-
-
-.share {
-    vertical-align: bottom;
+.share{
+    vertical-align: middle;
 }
 .share img {
     margin: 1px 2px 2px 2px;
     display: table-cell;
-
 }
+
 #tasks-list .edit,
 #tasks-list .delete,
 #tasks-list .share {
@@ -149,7 +147,7 @@ input, button{
     text-align: right;
 }
 
-.shared::after {
+.shared span::after {
     content: "";
     background: url("share_icon.png");
     width: 22px;

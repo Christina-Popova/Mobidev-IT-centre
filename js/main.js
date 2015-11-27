@@ -1,9 +1,4 @@
-
-
-
-
 (function() {
-
 
     window.App = {
         Models: {},
@@ -12,9 +7,7 @@
         Helper: {}
     };
 
-
     Parse.initialize("kbGqvtthGHcJtxulUtMXwHvULR1ORorGCCci8i4O", "61EgD1NeVAKFuE8IZwe6Vd1cXTigNl1cExolTYbB");
-
 
 
     //_______________________Helpers_____________________
@@ -50,8 +43,6 @@
     App.vent = _.extend({}, Parse.Events);
 
 
-
-
     //_______________________Models_____________________
 
     App.Models.Task =  Parse.Object.extend("Task", {
@@ -68,15 +59,12 @@
         },
 
         toggleStatus: function() {
-            this.set('isComplete', !this.get('isComplete'));
-            this.save();
+            this.save('isComplete', !this.get('isComplete'));
         }
     });
 
 
-
     //_______________________Collections_____________________
-
 
     App.Collections.TaskList = Parse.Collection.extend({
         model: App.Models.Task,
@@ -95,15 +83,10 @@
             if(!task.isValid()){
                 return;
             }
-            task.set({user: this.user});
-            task.save(null, {
-                success: function (){
-                    this.add(task);
-                }.bind(this)
-            });
+            task.save({user: this.user});
+            this.add(task);
         }
     });
-
 
 
     //______________________model View_____________________
@@ -135,7 +118,6 @@
             return this;
         },
 
-
         toggleStatus: function() {
             this.model.toggleStatus();
             this.showStatus();
@@ -146,7 +128,7 @@
         },
 
         showShareStatus: function(){
-            this.model.get('share') ? this.$el.find('span').addClass('shared') : this.$el.find('span').removeClass('shared');
+            this.model.get('share') ? this.$el.addClass('shared') : this.$el.removeClass('shared');
         },
 
         edit: function() {
@@ -154,17 +136,16 @@
             this.render();
         },
 
-        save: function(e) {
+        save: function() {
             App.Helper.hideError.bind(this)();
             var res = this.model.set({title: this.$el.find('input:text').val()}, {validate: true}, {silent:true});
-
             if(res){
                 this.model.save();
                 this.cancel();
             }
         },
 
-        cancel: function(e) {
+        cancel: function() {
             this.template = App.Helper.template('task-template');
             this.render();
         },
@@ -216,17 +197,14 @@
             }
 
             this.clear();
-
             var owner = new Parse.Query(App.Models.Task);
             owner.equalTo('user', user);
-
             var share = new Parse.Query(App.Models.Task);
             share.equalTo('share', user.id);
-
             var both = Parse.Query.or(owner, share);
             both.find({
                 success: function(results) {
-                    _.each(results, function(value, key) {
+                    _.each(results, function(value) {
                         this.collection.add(value);
                     }, this);
                 }.bind(this)
@@ -246,7 +224,6 @@
 
     App.Views.AddNewTask = Parse.View.extend({
         template: App.Helper.template('form-template'),
-
 
         initialize: function() {
             this.$el.hide();
@@ -305,7 +282,7 @@
         events: {
             'submit': 'signUp',
             'click .signup-cancel': 'cancel',
-            'click .btn-login': 'login',
+            'click .btn-login': 'login'
         },
 
         render: function (){
@@ -382,7 +359,7 @@
             });
         },
 
-        signUp: function(e) {
+        signUp: function() {
             this.clear();
             App.Helper.lockScreen();
             var signUp = new App.Views.SignUp ();
@@ -408,7 +385,6 @@
     });
 
 
-
     //______________________share View_____________________
 
     App.Views.Share = Parse.View.extend({
@@ -428,18 +404,12 @@
 
         submit: function(e) {
             e.preventDefault();
-            App.Helper.hideError.bind(this)
-            var shareEmail = this.$el.find('.email').val();
+            App.Helper.hideError.bind(this);
             var query = new Parse.Query(Parse.User);
-            query.equalTo('email', shareEmail);
-            query.find({
-                success: function(results) {
-                    if($.isEmptyObject(results)){
-                        this.errorMessage();
-                        return;
-                    }
-                    _.each(results, this.successShare, this);
-
+            query.equalTo('email', this.$el.find('.email').val());
+            query.first({
+                success: function(result) {
+                    return result ?  this.successShare(result) :  this.errorMessage();
                 }.bind(this),
                 error:   App.Helper.showError.bind(this)
             });
@@ -465,19 +435,17 @@
     });
 
 
-
     //__________________________________________
-
-
 
     var taskList = new App.Collections.TaskList();
     var taskListView = new App.Views.TaskListView({collection: taskList});
     var addNewTaskView = new App.Views.AddNewTask();
+    var container = $('.container');
 
-    $('.container').append(addNewTaskView.render().el);
-    $('.container').append(taskListView.render().el);
+    container.append(addNewTaskView.render().el);
+    container.append(taskListView.render().el);
 
     var loginForm = new App.Views.LogInOutForm();
-    $('.container').append(loginForm.el);
+    container.append(loginForm.el);
 
 })();
