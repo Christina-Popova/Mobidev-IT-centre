@@ -35,39 +35,51 @@
         <input type="text" required placeholder="New task" class="task">
         <input type="submit" value="Add new task">
     </form>
+    <div class="error"></div>
 </script>
 
 
 <script type="text/template" id="task-template">
-    <input class="status-toggle" type="checkbox" <%= isComplete ? 'checked="checked"' : ''%>>
-    <span><%= title %></span>
-    <button class="share">Share</button>
-    <button class="edit">Edit</button>
-    <button class="delete">Delete</button>
+    <div class="block">
+        <div class="align-left">
+            <input class="status-toggle" type="checkbox" <%= isComplete ? 'checked="checked"' : ''%>>
+            <span><%= title %></span>
+        </div>
+        <div class="align-right">
+            <button class="share"><img src="css/share.png"></button>
+            <button class="edit">Edit</button>
+            <button class="delete">X</button>
+        </div>
+    </div>
+    <!--<div class="error"></div>-->
 </script>
 
 
 <script type="text/template" id="edit-template">
     <input class="status-toggle" type="checkbox" <%= isComplete ? 'checked="checked"' : ''%>>
-    <input type='text' class='item' value=" <%= title %>" >
+    <input type='text' class='item' value="<%= title %>" >
     <button class="save">Save</button>
     <button class="edit-cancel">Cancel</button>
+    <div class="error model-error"></div>
 </script>
 
 
 <script type="text/template" id="login-template">
     <form id="login-form">
         <div class="row">
-            <input type="text" required placeholder="Login" class="login">
+            <input type="text"  placeholder="Login" class="login">
         </div>
         <div class="row">
-            <input type="password" required placeholder="Password" class="password">
+            <input type="password"  placeholder="Password" class="password">
         </div>
         <div class="row">
             <input type="submit" value="LogIn" class="btn-login btn-style">
         </div>
     </form>
-    <button class="signUp btn-style">SignUp</button>
+    <div class="row">
+        <button class="signUp btn-style">SignUp</button>
+    </div>
+    <div class="error"></div>
 </script>
 
 
@@ -87,21 +99,20 @@
         <div class="row">
             <input type="submit" value="SignUp" class="btn-signup btn-style">
         </div>
-        <div class="row">
-            <button class="signup-cancel btn-style">Cancel</button>
-        </div>
     </form>
-
+    <div class="row">
+        <button class="signup-cancel btn-style">Cancel</button>
+    </div>
+    <div class="error"></div>
 </script>
+
 
 <script type="text/template" id="successSignUp-template">
     <p>Thank you! Registration was successful!</p>
     <div class="row">
         <button class="btn-login btn-style">LogIn</button>
     </div>
-
 </script>
-
 
 
 <script type="text/template" id="logout-template">
@@ -110,6 +121,35 @@
         <button class="logOut">LogOut</button>
     </div>
 </script>
+
+
+<script type="text/template" id="share-template">
+    <h3>Please, input email user who will be share</h3>
+    <form id="share-form">
+        <div class="row">
+            <input type="email"  placeholder="Email" class="email">
+        </div>
+        <div class="row">
+            <input type="submit" value="Share" class="btn-share btn-style">
+        </div>
+    </form>
+    <div class="row">
+        <button class="share-cancel btn-style">Cancel</button>
+    </div>
+    <div class="error"></div>
+</script>
+
+
+<script type="text/template" id="successShare-template">
+    <p>Thank you! Task was add for user <b><%= user %></b> !</p>
+    <div class="row">
+        <button class="btn-continue btn-style">Ok</button>
+    </div>
+</script>
+
+
+
+
 
 
 

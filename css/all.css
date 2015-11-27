@@ -21,6 +21,10 @@ form{
     padding: 10px 0;
 }
 
+ul {
+    list-style: none;
+}
+
 input, button{
     font-family: 'Marck Script', cursive;
     font-size: 18px;
@@ -28,79 +32,131 @@ input, button{
 }
 
 .main{
-    box-sizing: content-box;
-    padding: 50px;
+   box-sizing: content-box;
+   padding: 50px;
 }
 
-.wrapper, .signUp-mode {
-    width: 500px;
-    margin: 0 auto;
-    padding: 30px 20px 20px 60px;
-    background-image: url("todo-bg.jpg");
-    border: 1px solid lightgrey;
-    box-shadow: 0 0 5px grey;
+.wrapper, .signUp-mode, .share-mode {
+   width: 600px;
+   margin: 0 auto;
+   padding: 30px 20px 20px 60px;
+   background-image: url("todo-bg.jpg");
+   border: 1px solid lightgrey;
+   box-shadow: 0 0 5px grey;
 }
+
 .complete span{
-    text-decoration: line-through;
-}
-.error{
-    color: red;
+   text-decoration: line-through;
 }
 
-.signUp-mode {
-    position: fixed;
-    top:100px;
-    left: 50%;
-    margin-left: -200px;
-    z-index: 3;
+.error {
+   color: red;
+   height: 16px;
+   font-size: 18px;
+}
+.model-error {
+    padding-left: 30px;
 }
 
-input, button{
-    font-family:'Marck Script', cursive;
-    font-size: 18px;
-    padding-left: 5px;
+.signUp-mode, .share-mode {
+   position: fixed;
+   top:175px;
+   left: 50%;
+   margin-left: -250px;
+   z-index: 3;
 }
- .login, .password, .email,.btn-style{
-     display: block;
-     width: 200px;
+
+
+.login, .password, .email,.btn-style{
+    width: 220px;
+}
+.item {
+    width: 315px;
+}
+
+.task{
+   width: 380px;
 }
 
 .row{
-    margin-bottom: 15px;
+   margin-bottom: 15px;
 }
+
 .copyright {
     font-size: 12px;
     margin-top: 50px;
     text-align: center;
     overflow: hidden;
-  }
+}
+
 .copyright span{
     float: left;
 }
+
 .copyright span+span{
     float: right;
 }
 
-#tasks-list button{
-    display:none;
-}
-#tasks-list li {
+#tasks-list li{
     line-height: 30px;
+
 }
-#tasks-list li:hover button {
-    display:inline;
-}
-#tasks-list li.complete:hover .edit,
-#tasks-list li.complete:hover .share{
-    display:none;
-}
-{
-    display:none;
+#tasks-list span{
+    position: relative;
 }
 
+.block:after {
+    content: " ";
+    display: table;
+    clear: both;
+}
+
+#tasks-list .align-left, .align-right{
+    float: left;
+}
+.align-left {
+    width: 345px
+}
+
+
+
+.share {
+    vertical-align: bottom;
+}
+.share img {
+    margin: 1px 2px 2px 2px;
+    display: table-cell;
+
+}
+#tasks-list .edit,
+#tasks-list .delete,
+#tasks-list .share {
+    visibility:hidden;
+}
+
+#tasks-list li:hover .edit,
+#tasks-list li:hover .delete,
+#tasks-list li:hover .share{
+    visibility:visible;
+}
+
+#tasks-list li.complete:hover .edit,
+#tasks-list li.complete:hover .share{
+    visibility:hidden;
+}
 
 #logout-block{
     text-align: right;
+}
+
+.shared::after {
+    content: "";
+    background: url("share_icon.png");
+    width: 22px;
+    height: 22px;
+    position: absolute;
+    right: -35px;
+    top: 2px;
 }
 
 

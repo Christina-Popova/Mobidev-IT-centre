@@ -39,6 +39,14 @@
         $("body").find('.overlay').remove();
     };
 
+    App.Helper.showError = function(model, error){
+        this.$el.find('.error').html(error.message);
+    };
+
+    App.Helper.hideError =  function(){
+        this.$el.find('.error').html("").show();
+    };
+
     App.vent = _.extend({}, Parse.Events);
 
 
@@ -52,8 +60,10 @@
         },
 
         validate: function(attrs) {
+            var errors = {};
             if (!($.trim(attrs.title))) {
-                return "Title can't be empty";
+                errors.message = "Title can't be empty";
+                return errors;
             }
         },
 
@@ -89,7 +99,7 @@
             task.save(null, {
                 success: function (){
                     this.add(task);
-                }.bind(this),
+                }.bind(this)
             });
         }
     });
@@ -106,7 +116,7 @@
         initialize: function() {
             this.model.on('change', this.render, this);
             this.model.on('destroy', this.remove, this);
-            this.model.on('error', this.showErrors, this);
+            this.model.on('error', App.Helper.showError, this);
         },
 
         events: {
@@ -121,16 +131,10 @@
         render: function() {
             this.$el.html(this.template(this.model.toJSON()));
             this.showStatus();
+            this.showShareStatus();
             return this;
         },
 
-        showErrors: function(model, error) {
-            this.$el.append("<div class='error'>"+ error + "</div>");
-        },
-
-        hideErrors: function(){
-            this.$el.find('.error').remove();
-        },
 
         toggleStatus: function() {
             this.model.toggleStatus();
@@ -141,14 +145,18 @@
             this.model.get('isComplete') ? this.$el.addClass('complete') : this.$el.removeClass('complete');
         },
 
+        showShareStatus: function(){
+            this.model.get('share') ? this.$el.find('span').addClass('shared') : this.$el.find('span').removeClass('shared');
+        },
+
         edit: function() {
             this.template = App.Helper.template('edit-template');
             this.render();
         },
 
         save: function(e) {
-            this.hideErrors();
-            var res = this.model.set({title: this.$el.find('input:text').val()}, {validate: true});
+            App.Helper.hideError.bind(this)();
+            var res = this.model.set({title: this.$el.find('input:text').val()}, {validate: true}, {silent:true});
 
             if(res){
                 this.model.save();
@@ -170,21 +178,10 @@
         },
 
         share: function () {
-            var shareEmail = prompt('Кого добавим?');
-
-            var query = new Parse.Query(Parse.User);
-            query.equalTo('email', shareEmail);
-            query.find({
-                success: function(results) {
-                    _.each(results, function(user) {
-                        this.model.addUnique('share', user.id)
-                        this.model.save();
-                    }, this);
-                }.bind(this)
-            });
-
+            App.Helper.lockScreen();
+            var shareView = new App.Views.Share({model: this.model});
+            $(".container").append(shareView.render().el);
         }
-
     });
 
 
@@ -219,9 +216,15 @@
             }
 
             this.clear();
-            var query = new Parse.Query(App.Models.Task);
-            query.equalTo('user', user);
-            query.find({
+
+            var owner = new Parse.Query(App.Models.Task);
+            owner.equalTo('user', user);
+
+            var share = new Parse.Query(App.Models.Task);
+            share.equalTo('share', user.id);
+
+            var both = Parse.Query.or(owner, share);
+            both.find({
                 success: function(results) {
                     _.each(results, function(value, key) {
                         this.collection.add(value);
@@ -252,7 +255,8 @@
         },
 
         events: {
-            'submit': 'submit'
+            'submit': 'submit',
+            'blur form' : 'blur'
         },
 
         render: function (){
@@ -262,9 +266,20 @@
 
         submit: function(e) {
             e.preventDefault();
+            App.Helper.hideError.bind(this)();
             var task = {title: this.$el.find('.task').val()};
-            App.vent.trigger('addNewTask', task);
             this.clear();
+            if (!($.trim(task.title))) {
+                this.errorMessage(task);
+                return;
+            }
+            App.vent.trigger('addNewTask', task);
+        },
+
+        errorMessage: function(task){
+            var errors = {};
+            errors.message = "Title can't be empty";
+            App.Helper.showError.bind(this)(task, errors);
         },
 
         toggleShow:function(){
@@ -273,8 +288,11 @@
 
         clear: function (){
             this.$el.find('.task').val("");
-        }
+        },
 
+        blur: function (){
+            App.Helper.hideError.bind(this)();
+        }
     });
 
 
@@ -282,21 +300,21 @@
 
     App.Views.SignUp = Parse.View.extend({
         template: App.Helper.template('signUp-template'),
+        className: 'signUp-mode',
 
         events: {
             'submit': 'signUp',
             'click .signup-cancel': 'cancel',
             'click .btn-login': 'login',
-            'blur input': 'hideErrors'
         },
 
         render: function (){
-            this.$el.addClass('signUp-mode');
             this.$el.html(this.template());
             return this;
         },
 
         signUp: function(e) {
+            App.Helper.hideError.bind(this)();
             e.preventDefault();
             this.user = new Parse.User();
             this.user.set({
@@ -309,7 +327,7 @@
                     this.template = App.Helper.template('successSignUp-template');
                     this.render();
                 }.bind(this),
-                error:   this.showError.bind(this)
+                error:   App.Helper.showError.bind(this)
             });
         },
 
@@ -321,14 +339,6 @@
         cancel: function (){
             App.Helper.unlockScreen();
             this.$el.remove();
-        },
-
-        showError: function(user, error){
-            this.$el.append("<div class='error'>"+ error.message + "</div>");
-        },
-
-        hideErrors: function(){
-            this.$el.find('.error').remove();
         }
     });
 
@@ -341,9 +351,7 @@
         events: {
             'submit #login-form': 'login',
             'click .logOut': 'logOut',
-            'click .signUp': 'signUp',
-            'blur input': 'hideErrors'
-
+            'click .signUp': 'signUp'
         },
 
         initialize: function () {
@@ -361,7 +369,7 @@
 
         login: function(e) {
             e.preventDefault();
-            this.hideErrors();
+            App.Helper.hideError.bind(this)();
 
             var login = this.$el.find("#login-form").find('.login').val();
             var password = this.$el.find("#login-form").find('.password').val();
@@ -370,11 +378,12 @@
                 success: function (){
                     App.vent.trigger('login', Parse.User.current());
                 }.bind(this),
-                error:   this.showError.bind(this)
+                error:   App.Helper.showError.bind(this)
             });
         },
 
         signUp: function(e) {
+            this.clear();
             App.Helper.lockScreen();
             var signUp = new App.Views.SignUp ();
             $(".container").append(signUp.render().el);
@@ -383,26 +392,78 @@
         logOut: function(){
             Parse.User.logOut();
             App.vent.trigger('logout');
-
             this.template = App.Helper.template('login-template');
             this.render();
 
+        },
+        clear: function() {
+            App.Helper.hideError.bind(this)();
+            this.$el.find('input:not([type=submit])').val("");
         },
 
         successLogin: function(){
             this.template = App.Helper.template('logout-template');
             this.render();
-        },
-
-        showError: function(user, error){
-            this.$el.append("<div class='error'>"+ error.message + "</div>");
-        },
-
-        hideErrors: function(){
-            this.$el.find('.error').remove();
         }
-
     });
+
+
+
+    //______________________share View_____________________
+
+    App.Views.Share = Parse.View.extend({
+        template: App.Helper.template('share-template'),
+        className: 'share-mode',
+
+        events: {
+            'submit': 'submit',
+            'click .share-cancel': 'cancel',
+            'click .btn-continue': 'cancel'
+        },
+
+        render: function (){
+            this.$el.html(this.template());
+            return this;
+        },
+
+        submit: function(e) {
+            e.preventDefault();
+            App.Helper.hideError.bind(this)
+            var shareEmail = this.$el.find('.email').val();
+            var query = new Parse.Query(Parse.User);
+            query.equalTo('email', shareEmail);
+            query.find({
+                success: function(results) {
+                    if($.isEmptyObject(results)){
+                        this.errorMessage();
+                        return;
+                    }
+                    _.each(results, this.successShare, this);
+
+                }.bind(this),
+                error:   App.Helper.showError.bind(this)
+            });
+        },
+
+        errorMessage: function(){
+            var errors= {};
+            errors.message = 'User with this email does not exist!';
+            App.Helper.showError.bind(this)(this.model, errors);
+        },
+
+        successShare: function(user){
+            this.model.addUnique('share', user.id);
+            this.model.save();
+            this.template = App.Helper.template('successShare-template');
+            this.$el.html(this.template({user: user.get('username')}));
+        },
+
+        cancel: function (){
+            App.Helper.unlockScreen();
+            this.$el.remove();
+        }
+    });
+
 
 
     //__________________________________________
