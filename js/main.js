@@ -4,7 +4,8 @@
         Models: {},
         Collections: {},
         Views: {},
-        Helper: {}
+        Helper: {},
+        Router: {}
     };
 
     Parse.initialize("kbGqvtthGHcJtxulUtMXwHvULR1ORorGCCci8i4O", "61EgD1NeVAKFuE8IZwe6Vd1cXTigNl1cExolTYbB");
@@ -41,6 +42,9 @@
     };
 
     App.vent = _.extend({}, Parse.Events);
+
+
+
 
 
     //_______________________Models_____________________
@@ -170,7 +174,7 @@
 
     App.Views.TaskListView = Parse.View.extend({
         tagName: 'ul',
-        id: 'tasks-list',
+        el:  $("#tasks-list"),
 
         initialize: function() {
             this.collection.on('add', this.addOne, this);
@@ -179,12 +183,16 @@
         },
 
         login: function(user){
+            console.log('login ul');
             this.render(user);
-            this.$el.show();
+            //this.$el.show();
         },
 
         logout: function(){
-            this.$el.hide();
+            this.$el.empty();
+            App.vent.off('login');
+            App.vent.off('logout');
+            //this.$el.hide();
         },
 
         clear: function (){
@@ -224,11 +232,14 @@
 
     App.Views.AddNewTask = Parse.View.extend({
         template: App.Helper.template('form-template'),
+        el:  $(".add-form-block"),
 
         initialize: function() {
-            this.$el.hide();
-            App.vent.on('login', this.toggleShow, this);
-            App.vent.on('logout', this.toggleShow, this);
+            //this.$el.hide();
+            //App.vent.on('login', this.toggleShow, this);
+            //App.vent.on('logout', this.toggleShow, this);
+            App.vent.on('logout', this.logout, this);
+            this.render();
         },
 
         events: {
@@ -239,6 +250,11 @@
         render: function (){
             this.$el.html(this.template());
             return this;
+        },
+
+        logout: function(){
+            App.vent.off('logout');
+            this.$el.empty();
         },
 
         submit: function(e) {
@@ -259,9 +275,9 @@
             App.Helper.showError.bind(this)(task, errors);
         },
 
-        toggleShow:function(){
-            this.$el.toggle();
-        },
+        //toggleShow:function(){
+        //    this.$el.toggle();
+        //},
 
         clear: function (){
             this.$el.find('.task').val("");
@@ -324,6 +340,7 @@
 
     App.Views.LogInOutForm = Parse.View.extend({
         template: App.Helper.template('login-template'),
+        el:  $(".login-block"),
 
         events: {
             'submit #login-form': 'login',
@@ -353,6 +370,7 @@
 
             Parse.User.logIn(login, password, {
                 success: function (){
+                    appRouter.navigate("/authorized/" + Parse.User.current().id, true);
                     App.vent.trigger('login', Parse.User.current());
                 }.bind(this),
                 error:   App.Helper.showError.bind(this)
@@ -368,7 +386,9 @@
 
         logOut: function(){
             Parse.User.logOut();
+            appRouter.navigate("", true);
             App.vent.trigger('logout');
+
             this.template = App.Helper.template('login-template');
             this.render();
 
@@ -435,17 +455,31 @@
     });
 
 
-    //__________________________________________
+    //_______________________Router_____________________
 
-    var taskList = new App.Collections.TaskList();
-    var taskListView = new App.Views.TaskListView({collection: taskList});
-    var addNewTaskView = new App.Views.AddNewTask();
-    var container = $('.container');
+    App.Router.AppRouter = Parse.Router.extend({
+        routes: {
+            "": "index",
+            'authorized/:id' : 'authorized'
+        },
 
-    container.append(addNewTaskView.render().el);
-    container.append(taskListView.render().el);
+        index: function () {
+            console.log('index page');
+            new App.Views.LogInOutForm();
+        },
 
-    var loginForm = new App.Views.LogInOutForm();
-    container.append(loginForm.el);
+        authorized: function () {
+            console.log('authorized page');
+            var taskList = new App.Collections.TaskList();
+            new App.Views.TaskListView({collection: taskList});
+            new App.Views.AddNewTask();
+        }
+    });
+
+
+    var appRouter = new App.Router.AppRouter();
+    Parse.history.start();
+
+
 
 })();
