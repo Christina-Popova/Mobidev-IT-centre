@@ -172,16 +172,13 @@
 
     App.Views.TaskListView = Parse.View.extend({
         tagName: 'ul',
-        elClassName: "#tasks-list",
+        id: 'tasks-list',
 
         initialize: function() {
             this.collection.on('add', this.addOne, this);
         },
 
         render: function() {
-            if(!Parse.User.current()){
-                return this;
-            }
 
             var owner = new Parse.Query(App.Models.Task);
             owner.equalTo('user', Parse.User.current());
@@ -211,7 +208,6 @@
 
     App.Views.AddNewTask = Parse.View.extend({
         template: App.Helper.template('form-template'),
-        elClassName: "#add-form",
 
         events: {
             'submit': 'submit',
@@ -302,7 +298,7 @@
 
     App.Views.LogIn = Parse.View.extend({
         template: App.Helper.template('login-template'),
-        el: "#login",
+        el: "#login-block",
 
         events: {
             'submit #login-form': 'login',
@@ -408,7 +404,6 @@
 
     App.Views.LogOut = Parse.View.extend({
         template: App.Helper.template('logout-template'),
-        elClassName: "#logout",
 
         events: {
             'click .logOut': 'logOut'
@@ -434,41 +429,21 @@
 
     App.Views.ManageTodosView = Parse.View.extend({
         template: App.Helper.template('app-template'),
-        el: "#manage",
+        el: "#manage-block",
 
         initialize: function () {
             App.vent.on('logout', this.logout, this);
             this.collection = new App.Collections.TaskList();
-
-            this.createSubViews([
-                {constructor: App.Views.LogOut, name: 'logOutView'},
-                {constructor: App.Views.AddNewTask, name: 'addNewTaskView'},
-                {constructor: App.Views.TaskListView, name: 'taskListView'}
-            ]);
         },
 
-        createSubViews: function(subViews){
-            _.each(subViews, function(subView){
-                this[subView.name] = new subView.constructor(this);
-            }, this);
-        },
 
-        renderSubViews: function(subViews){
-            _.each(subViews, function(subView){
-                subView.$el = this.$el.find(subView.elClassName);
-                subView.render();
-            }, this);
-        },
 
         render: function () {
-            console.log(this);
-            this.$el.html(this.template());
 
-            this.renderSubViews([
-                this.logOutView,
-                this.addNewTaskView,
-                this.taskListView
-            ]);
+            this.$el.html(this.template());
+            this.$el.append(new App.Views.AddNewTask().render().el);
+            this.$el.append(new App.Views.TaskListView({collection:this.collection}).render().el);
+            this.$el.append(new App.Views.LogOut().render().el);
             return this;
         },
 
@@ -477,9 +452,9 @@
         }
     });
 
-    //________________Wraper Vieww_____________________
+    //________________Content Vieww_____________________
 
-    App.Views.WraperView = Parse.View.extend({
+    App.Views.ContentView = Parse.View.extend({
         template: App.Helper.template('app-template'),
         el: ".content",
 
@@ -521,7 +496,7 @@
         }
     });
 
-    var wrapper = new App.Views.WraperView();
+    var wrapper = new App.Views.ContentView();
 
 
     App.appRouter = new App.Router.AppRouter();
