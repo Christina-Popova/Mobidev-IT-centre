@@ -85,7 +85,7 @@
             if(!task.isValid()){
                 return;
             }
-            task.save({user: App.currentUser});
+            task.save({user: Parse.User.current()});
             this.add(task);
         }
     });
@@ -179,14 +179,14 @@
         },
 
         render: function() {
-            if(!App.currentUser){
+            if(!Parse.User.current()){
                 return this;
             }
 
             var owner = new Parse.Query(App.Models.Task);
-            owner.equalTo('user', App.currentUser);
+            owner.equalTo('user', Parse.User.current());
             var share = new Parse.Query(App.Models.Task);
-            share.equalTo('share', App.currentUser.id);
+            share.equalTo('share', Parse.User.current().id);
             var both = Parse.Query.or(owner, share);
             both.find({
                 success: function(results) {
@@ -311,7 +311,6 @@
 
         initialize: function () {
             App.vent.on('login', this.successLogin, this);
-            this.render();
         },
 
         render: function (){
@@ -494,7 +493,10 @@
         },
 
         authorized: function () {
-            App.currentUser = Parse.User.current();
+            if(!Parse.User.current()){
+                App.appRouter.navigate("", true);
+                return;
+            }
             manageTodosView.render();
             manageTodosView.$el.appendTo( ".container" );
         }
