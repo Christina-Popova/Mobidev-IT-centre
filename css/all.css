@@ -31,7 +31,7 @@ input, button{
     padding-left: 5px;
 }
 
-.main{
+.container{
    box-sizing: content-box;
    padding: 50px;
 }

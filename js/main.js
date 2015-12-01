@@ -163,7 +163,7 @@
         share: function () {
             App.Helper.lockScreen();
             var shareView = new App.Views.Share({model: this.model});
-            $(".container").append(shareView.render().el);
+            $(".content").append(shareView.render().el);
         }
     });
 
@@ -337,7 +337,7 @@
             this.clear();
             App.Helper.lockScreen();
             var signUp = new App.Views.SignUp ();
-            $(".container").append(signUp.render().el);
+            $(".content").append(signUp.render().el);
         },
 
         clear: function() {
@@ -347,7 +347,7 @@
 
         successLogin: function(){
             console.log('LOGIN');
-            App.appRouter.navigate("/authorized/" + Parse.User.current().id, true);
+            App.appRouter.navigate("/todo/" + Parse.User.current().id, true);
             this.$el.detach();
         }
     });
@@ -428,7 +428,9 @@
 
 
 
-    //________________ManageTodosView View_____________________
+
+
+    //_______________ManageTodosView View_____________________
 
     App.Views.ManageTodosView = Parse.View.extend({
         template: App.Helper.template('app-template'),
@@ -458,9 +460,10 @@
             }, this);
         },
 
-
         render: function () {
+            console.log(this);
             this.$el.html(this.template());
+
             this.renderSubViews([
                 this.logOutView,
                 this.addNewTaskView,
@@ -474,13 +477,31 @@
         }
     });
 
+    //________________Wraper Vieww_____________________
+
+    App.Views.WraperView = Parse.View.extend({
+        template: App.Helper.template('app-template'),
+        el: ".content",
+
+        pageList: {
+            index:  new App.Views.LogIn(),
+            todo: new App.Views.ManageTodosView()
+        },
+
+        open: function(viewName){
+            console.log(viewName);
+            var view = this.pageList[viewName].render();
+            view.$el.appendTo(this.$el);
+        }
+    });
+
 
     //_______________________Router_____________________
 
     App.Router.AppRouter = Parse.Router.extend({
         routes: {
             "": "index",
-            'authorized/:id' : 'authorized'
+            'todo/:id' : 'todo'
         },
 
         index: function () {
@@ -488,22 +509,21 @@
                 App.vent.trigger('login');
                 return;
             }
-            logInView.render();
-            logInView.$el.appendTo( ".container" );
+            wrapper.open('index');
         },
 
-        authorized: function () {
+        todo: function () {
             if(!Parse.User.current()){
                 App.appRouter.navigate("", true);
                 return;
             }
-            manageTodosView.render();
-            manageTodosView.$el.appendTo( ".container" );
+            wrapper.open('todo');
         }
     });
 
-    var logInView = new App.Views.LogIn();
-    var manageTodosView = new App.Views.ManageTodosView();
+    var wrapper = new App.Views.WraperView();
+
+
     App.appRouter = new App.Router.AppRouter();
     Parse.history.start();
 
