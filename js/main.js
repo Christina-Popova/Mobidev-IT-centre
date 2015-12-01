@@ -72,22 +72,20 @@
 
     App.Collections.TaskList = Parse.Collection.extend({
         model: App.Models.Task,
+
         initialize: function() {
             App.vent.on('addNewTask', this.addTask, this);
             App.vent.on('logout', this.reset, this);
-            App.vent.on('login', this.setUser, this);
-        },
-
-        setUser: function(user){
-            this.user = user;
+            App.vent.on('login', this.reset, this);
         },
 
         addTask: function(task){
+            console.log('add');
             task = new App.Models.Task(task);
             if(!task.isValid()){
                 return;
             }
-            task.save({user: this.user});
+            task.save({user: App.currentUser});
             this.add(task);
         }
     });
@@ -174,41 +172,21 @@
 
     App.Views.TaskListView = Parse.View.extend({
         tagName: 'ul',
-        el:  $("#tasks-list"),
+        elClassName: "#tasks-list",
 
         initialize: function() {
             this.collection.on('add', this.addOne, this);
-            App.vent.on('login', this.login, this);
-            App.vent.on('logout', this.logout, this);
         },
 
-        login: function(user){
-            console.log('login ul');
-            this.render(user);
-            //this.$el.show();
-        },
-
-        logout: function(){
-            this.$el.empty();
-            App.vent.off('login');
-            App.vent.off('logout');
-            //this.$el.hide();
-        },
-
-        clear: function (){
-            this.$el.empty();
-        },
-
-        render: function(user) {
-            if(!user){
+        render: function() {
+            if(!App.currentUser){
                 return this;
             }
 
-            this.clear();
             var owner = new Parse.Query(App.Models.Task);
-            owner.equalTo('user', user);
+            owner.equalTo('user', App.currentUser);
             var share = new Parse.Query(App.Models.Task);
-            share.equalTo('share', user.id);
+            share.equalTo('share', App.currentUser.id);
             var both = Parse.Query.or(owner, share);
             both.find({
                 success: function(results) {
@@ -222,6 +200,7 @@
 
         addOne: function(task) {
             var taskList = new App.Views.TaskView({ model: task });
+
             this.$el.prepend(taskList.render().el);
         }
 
@@ -232,15 +211,7 @@
 
     App.Views.AddNewTask = Parse.View.extend({
         template: App.Helper.template('form-template'),
-        el:  $(".add-form-block"),
-
-        initialize: function() {
-            //this.$el.hide();
-            //App.vent.on('login', this.toggleShow, this);
-            //App.vent.on('logout', this.toggleShow, this);
-            App.vent.on('logout', this.logout, this);
-            this.render();
-        },
+        elClassName: "#add-form",
 
         events: {
             'submit': 'submit',
@@ -250,11 +221,6 @@
         render: function (){
             this.$el.html(this.template());
             return this;
-        },
-
-        logout: function(){
-            App.vent.off('logout');
-            this.$el.empty();
         },
 
         submit: function(e) {
@@ -274,10 +240,6 @@
             errors.message = "Title can't be empty";
             App.Helper.showError.bind(this)(task, errors);
         },
-
-        //toggleShow:function(){
-        //    this.$el.toggle();
-        //},
 
         clear: function (){
             this.$el.find('.task').val("");
@@ -326,7 +288,7 @@
 
         login: function(){
             this.cancel();
-            App.vent.trigger('login', this.user);
+            App.vent.trigger('login');
         },
 
         cancel: function (){
@@ -336,24 +298,20 @@
     });
 
 
-    //______________________logIn, logOut View_____________________
+    //______________________logIn View_____________________
 
-    App.Views.LogInOutForm = Parse.View.extend({
+    App.Views.LogIn = Parse.View.extend({
         template: App.Helper.template('login-template'),
-        el:  $(".login-block"),
+        el: "#login",
 
         events: {
             'submit #login-form': 'login',
-            'click .logOut': 'logOut',
             'click .signUp': 'signUp'
         },
 
         initialize: function () {
             App.vent.on('login', this.successLogin, this);
-
-            if(Parse.User.current()){
-                App.vent.trigger('login', Parse.User.current());
-            } else this.render();
+            this.render();
         },
 
         render: function (){
@@ -370,8 +328,7 @@
 
             Parse.User.logIn(login, password, {
                 success: function (){
-                    appRouter.navigate("/authorized/" + Parse.User.current().id, true);
-                    App.vent.trigger('login', Parse.User.current());
+                    App.vent.trigger('login');
                 }.bind(this),
                 error:   App.Helper.showError.bind(this)
             });
@@ -384,25 +341,18 @@
             $(".container").append(signUp.render().el);
         },
 
-        logOut: function(){
-            Parse.User.logOut();
-            appRouter.navigate("", true);
-            App.vent.trigger('logout');
-
-            this.template = App.Helper.template('login-template');
-            this.render();
-
-        },
         clear: function() {
             App.Helper.hideError.bind(this)();
             this.$el.find('input:not([type=submit])').val("");
         },
 
         successLogin: function(){
-            this.template = App.Helper.template('logout-template');
-            this.render();
+            console.log('LOGIN');
+            App.appRouter.navigate("/authorized/" + Parse.User.current().id, true);
+            this.$el.detach();
         }
     });
+
 
 
     //______________________share View_____________________
@@ -455,6 +405,77 @@
     });
 
 
+    //______________________logOut View_____________________
+
+    App.Views.LogOut = Parse.View.extend({
+        template: App.Helper.template('logout-template'),
+        elClassName: "#logout",
+
+        events: {
+            'click .logOut': 'logOut'
+        },
+
+        render: function (){
+            this.$el.html(this.template());
+            return this;
+        },
+
+        logOut: function(){
+            Parse.User.logOut();
+            App.vent.trigger('logout');
+            App.appRouter.navigate("", true);
+        }
+    });
+
+
+
+    //________________ManageTodosView View_____________________
+
+    App.Views.ManageTodosView = Parse.View.extend({
+        template: App.Helper.template('app-template'),
+        el: "#manage",
+
+        initialize: function () {
+            App.vent.on('logout', this.logout, this);
+            this.collection = new App.Collections.TaskList();
+
+            this.createSubViews([
+                {constructor: App.Views.LogOut, name: 'logOutView'},
+                {constructor: App.Views.AddNewTask, name: 'addNewTaskView'},
+                {constructor: App.Views.TaskListView, name: 'taskListView'}
+            ]);
+        },
+
+        createSubViews: function(subViews){
+            _.each(subViews, function(subView){
+                this[subView.name] = new subView.constructor(this);
+            }, this);
+        },
+
+        renderSubViews: function(subViews){
+            _.each(subViews, function(subView){
+                subView.$el = this.$el.find(subView.elClassName);
+                subView.render();
+            }, this);
+        },
+
+
+        render: function () {
+            this.$el.html(this.template());
+            this.renderSubViews([
+                this.logOutView,
+                this.addNewTaskView,
+                this.taskListView
+            ]);
+            return this;
+        },
+
+        logout: function() {
+            this.$el.detach();
+        }
+    });
+
+
     //_______________________Router_____________________
 
     App.Router.AppRouter = Parse.Router.extend({
@@ -464,22 +485,25 @@
         },
 
         index: function () {
-            console.log('index page');
-            new App.Views.LogInOutForm();
+            if(Parse.User.current()){
+                App.vent.trigger('login');
+                return;
+            }
+            logInView.render();
+            logInView.$el.appendTo( ".container" );
         },
 
         authorized: function () {
-            console.log('authorized page');
-            var taskList = new App.Collections.TaskList();
-            new App.Views.TaskListView({collection: taskList});
-            new App.Views.AddNewTask();
+            App.currentUser = Parse.User.current();
+            manageTodosView.render();
+            manageTodosView.$el.appendTo( ".container" );
         }
     });
 
-
-    var appRouter = new App.Router.AppRouter();
+    var logInView = new App.Views.LogIn();
+    var manageTodosView = new App.Views.ManageTodosView();
+    App.appRouter = new App.Router.AppRouter();
     Parse.history.start();
-
 
 
 })();
