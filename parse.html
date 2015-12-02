@@ -20,7 +20,6 @@
             <h1>To do list</h1>
             <div id="login-block"></div>
             <div id="manage-block"></div>
-
         </div>
 
         <div class="copyright">
@@ -36,6 +35,17 @@
 
 <script type="text/template" id="app-template">
 
+</script>
+
+<script type="text/template" id="filter-template">
+    <button class="selected" id="all">All</button>
+    <button id="completed">Completed</button>
+    <button id="active">Active</button>
+</script>
+
+<script type="text/template" id="tools-template">
+    <label><input class='all-complete' type="checkbox">Check all</label>
+    <button class="clear-completed">Clear completed</button>
 </script>
 
 <script type="text/template" id="form-template">
@@ -59,7 +69,6 @@
             <button class="delete">X</button>
         </div>
     </div>
-    <!--<div class="error"></div>-->
 </script>
 
 

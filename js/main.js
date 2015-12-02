@@ -48,7 +48,8 @@
 
     App.Models.Task =  Parse.Object.extend("Task", {
         defaults: {
-            isComplete: false
+            isComplete: false,
+            isShare: false
         },
 
         validate: function(attrs) {
@@ -72,11 +73,37 @@
 
         initialize: function() {
             App.vent.on('addNewTask', this.addTask, this);
-            App.vent.on('login', this.reset, this);
+            App.vent.on('login', this.login, this);
+            App.vent.on('allCompleted', this.allCompleted, this);
+        },
+
+        login:function (){
+            this.reset();
+            var query = this.createQuery();
+            query.find({
+                success: function(results) {
+                    _.each(results, function(value) {
+                        this.add(value);
+                    }, this);
+                }.bind(this)
+            });
+        },
+
+        createQuery: function () {
+            var user = new Parse.Query(App.Models.Task);
+            user.equalTo('user', Parse.User.current());
+            var share = new Parse.Query(App.Models.Task);
+            share.equalTo("share", Parse.User.current());
+            return Parse.Query.or(user, share);
+        },
+
+        allCompleted: function (flag){
+            this.each(function(task){
+                task.save({isComplete: flag})
+            }, this)
         },
 
         addTask: function(task){
-            console.log('add');
             task = new App.Models.Task(task);
             if(!task.isValid()){
                 return;
@@ -85,7 +112,6 @@
             this.add(task);
         }
     });
-
 
     //______________________model View_____________________
 
@@ -98,6 +124,7 @@
             this.model.on('change', this.render, this);
             this.model.on('destroy', this.remove, this);
             this.model.on('error', App.Helper.showError, this);
+            App.vent.on('clearCompleted', this.clearCompleted, this);
         },
 
         events: {
@@ -126,7 +153,7 @@
         },
 
         showShareStatus: function(){
-            this.model.get('share') ? this.$el.addClass('shared') : this.$el.removeClass('shared');
+            this.model.get('isShare') ? this.$el.addClass('shared') : this.$el.removeClass('shared');
         },
 
         edit: function() {
@@ -160,6 +187,10 @@
             App.Helper.lockScreen();
             var shareView = new App.Views.Share({model: this.model});
             $(".content").append(shareView.render().el);
+        },
+
+        clearCompleted:function () {
+            return this.model.get('isComplete') ? this.destroy() : false;
         }
     });
 
@@ -172,27 +203,35 @@
 
         initialize: function() {
             this.collection.on('add', this.addOne, this);
+            App.vent.on('change: filter', this.filter, this);
         },
 
         render: function() {
-            var owner = new Parse.Query(App.Models.Task);
-            owner.equalTo('user', Parse.User.current());
-            var share = new Parse.Query(App.Models.Task);
-            share.equalTo('share', Parse.User.current().id);
-            var both = Parse.Query.or(owner, share);
-            both.find({
-                success: function(results) {
-                    _.each(results, function(value) {
-                        this.collection.add(value);
-                    }, this);
-                }.bind(this)
-            });
+            this.collection.each(this.addOne, this);
             return this;
+        },
+
+        filter: function (filter){
+            this.$el.empty();
+            if (filter === "all") {
+                this.addSome(this.collection.models);
+                return;
+            }
+            var flag = filter === "completed" ;
+            var filteredCollection = _.filter(this.collection.models, function(item){
+                return item.get('isComplete') === flag;
+            });
+            this.addSome(filteredCollection);
+        },
+
+        addSome: function(filteredCollection) {
+            _.each(filteredCollection, function(item){
+                this.addOne(item)
+            }, this);
         },
 
         addOne: function(task) {
             var taskList = new App.Views.TaskView({ model: task });
-
             this.$el.prepend(taskList.render().el);
         }
     });
@@ -260,10 +299,6 @@
             'click .signUp': 'signUp'
         },
 
-        initialize: function () {
-            App.vent.on('login', this.successLogin, this);
-        },
-
         render: function (){
             this.$el.html(this.template());
             return this;
@@ -275,7 +310,7 @@
             this.readData();
             Parse.User.logIn(this.userName, this.password, {
                 success: function (){
-                    App.vent.trigger('login');
+                    Parse.history.navigate("/todo/" + Parse.User.current().id, true);
                 }.bind(this),
                 error:   App.Helper.showError.bind(this)
             });
@@ -299,7 +334,6 @@
         },
 
         successLogin: function(){
-            console.log('LOGIN');
             Parse.history.navigate("/todo/" + Parse.User.current().id, true);
         }
     });
@@ -346,7 +380,7 @@
 
         login: function(){
             this.cancel();
-            App.vent.trigger('login');
+            Parse.history.navigate("/todo/" + Parse.User.current().id, true);
         },
 
         cancel: function (){
@@ -376,6 +410,7 @@
         submit: function(e) {
             e.preventDefault();
             App.Helper.hideError.bind(this);
+
             var query = new Parse.Query(Parse.User);
             query.equalTo('email', this.$el.find('.email').val());
             query.first({
@@ -393,7 +428,9 @@
         },
 
         successShare: function(user){
-            this.model.addUnique('share', user.id);
+            var relation = this.model.relation("share");
+            relation.add(user);
+            this.model.set('isShare', true);
             this.model.save();
             this.template = App.Helper.template('successShare-template');
             this.$el.html(this.template({user: user.get('username')}));
@@ -426,6 +463,53 @@
         }
     });
 
+    //______________________filter View_____________________
+
+    App.Views.FilterView = Parse.View.extend({
+        template: App.Helper.template('filter-template'),
+        id: 'filter',
+
+        events: {
+            'click ': 'changeFilter'
+        },
+
+        render: function (){
+            this.$el.html(this.template());
+            return this;
+        },
+
+        changeFilter: function(e){
+            $(e.target).parent().children().removeClass('selected');
+            $(e.target).addClass('selected');
+            App.vent.trigger('change: filter',  $(e.target).attr("id"))
+        }
+    });
+
+    //______________________tools View_____________________
+
+    App.Views.ToolsView = Parse.View.extend({
+        template: App.Helper.template('tools-template'),
+        id: 'tools',
+
+        events: {
+            'click .all-complete': 'allCompleted',
+            'click .clear-completed': 'clearCompleted'
+        },
+
+        render: function (){
+            this.$el.html(this.template());
+            return this;
+        },
+
+        allCompleted: function(e){
+            App.vent.trigger('allCompleted',  $(e.target).prop('checked'));
+        },
+
+        clearCompleted: function(){
+            App.vent.trigger('clearCompleted')
+        }
+    });
+
 
     //_______________ManageTodosView View_____________________
 
@@ -438,10 +522,11 @@
         },
 
         render: function () {
-
             this.$el.html(this.template());
             this.$el.append(new App.Views.AddNewTask().render().el);
-            this.$el.append(new App.Views.TaskListView({collection:this.collection}).render().el);
+            this.$el.append(new App.Views.ToolsView().render().el);
+            this.$el.append(new App.Views.TaskListView({collection: this.collection}).render().el);
+            this.$el.append(new App.Views.FilterView().render().el);
             this.$el.append(new App.Views.LogOut().render().el);
             return this;
         }
@@ -455,8 +540,8 @@
         el: ".content",
 
         pageList: {
-            index:  new App.Views.LogIn(),
-            todo: new App.Views.ManageTodosView()
+            index: new App.Views.LogIn(),
+            todo:  new App.Views.ManageTodosView()
         },
 
         open: function(viewName){
@@ -481,12 +566,16 @@
             'todo/:id' : 'todo'
         },
 
+        initialize: function(){
+           this.contentView = new App.Views.ContentView();
+        },
+
         index: function () {
             if(Parse.User.current()){
-                App.vent.trigger('login');
+                Parse.history.navigate("/todo/" + Parse.User.current().id, true);
                 return;
             }
-            content.open('index');
+            this.contentView.open('index');
         },
 
         todo: function () {
@@ -494,13 +583,13 @@
                 Parse.history.navigate("", true);
                 return;
             }
-            content.open('todo');
+            App.vent.trigger('login');
+            this.contentView.open('todo');
         }
     });
 
-    var content = new App.Views.ContentView();
-    new App.Router.AppRouter();
 
+    new App.Router.AppRouter();
     Parse.history.start();
 
 })();

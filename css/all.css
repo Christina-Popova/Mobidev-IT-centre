@@ -54,6 +54,7 @@ input, button{
    height: 16px;
    font-size: 18px;
 }
+
 .model-error {
     padding-left: 30px;
 }
@@ -64,6 +65,13 @@ input, button{
    left: 50%;
    margin-left: -250px;
    z-index: 3;
+}
+
+.overlay {
+    position: absolute;
+    z-index: 2;
+    background-color: grey;
+    opacity: 0.4;
 }
 
 
@@ -117,7 +125,6 @@ input, button{
 .align-left {
     width: 315px
 }
-
 .share{
     vertical-align: middle;
 }
@@ -125,6 +132,36 @@ input, button{
     margin: 1px 2px 2px 2px;
     display: table-cell;
 }
+
+#tools, #filter {
+    margin: 10px 25px 10px 40px;
+    padding: 10px 0;
+}
+
+#tools{
+    border-bottom: 1px solid grey;
+}
+
+#tools button{
+    margin-left: 200px;
+}
+
+#filter{
+    border-top: 1px solid grey;
+}
+#filter button {
+    width: 100px;
+    margin-left: 5px;
+}
+
+#filter button + button{
+    margin-left: 55px;
+}
+
+.selected {
+    font-weight: bold;
+}
+
 
 #tasks-list .edit,
 #tasks-list .delete,
