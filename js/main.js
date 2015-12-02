@@ -44,9 +44,6 @@
     App.vent = _.extend({}, Parse.Events);
 
 
-
-
-
     //_______________________Models_____________________
 
     App.Models.Task =  Parse.Object.extend("Task", {
@@ -75,7 +72,6 @@
 
         initialize: function() {
             App.vent.on('addNewTask', this.addTask, this);
-            App.vent.on('logout', this.reset, this);
             App.vent.on('login', this.reset, this);
         },
 
@@ -179,7 +175,6 @@
         },
 
         render: function() {
-
             var owner = new Parse.Query(App.Models.Task);
             owner.equalTo('user', Parse.User.current());
             var share = new Parse.Query(App.Models.Task);
@@ -200,7 +195,6 @@
 
             this.$el.prepend(taskList.render().el);
         }
-
     });
 
 
@@ -222,13 +216,21 @@
         submit: function(e) {
             e.preventDefault();
             App.Helper.hideError.bind(this)();
-            var task = {title: this.$el.find('.task').val()};
-            this.clear();
-            if (!($.trim(task.title))) {
-                this.errorMessage(task);
-                return;
+            this.readData();
+            if(!this.isDataValid()){
+                this.errorMessage(this.task);
+            } else {
+                App.vent.trigger('addNewTask', this.task);
             }
-            App.vent.trigger('addNewTask', task);
+        },
+
+        readData: function(){
+            this.task = {title: this.$el.find('.task').val()};
+            this.clear();
+        },
+
+        isDataValid: function(){
+            return ($.trim(this.task.title));
         },
 
         errorMessage: function(task){
@@ -243,53 +245,6 @@
 
         blur: function (){
             App.Helper.hideError.bind(this)();
-        }
-    });
-
-
-    //______________________signUp View_____________________
-
-    App.Views.SignUp = Parse.View.extend({
-        template: App.Helper.template('signUp-template'),
-        className: 'signUp-mode',
-
-        events: {
-            'submit': 'signUp',
-            'click .signup-cancel': 'cancel',
-            'click .btn-login': 'login'
-        },
-
-        render: function (){
-            this.$el.html(this.template());
-            return this;
-        },
-
-        signUp: function(e) {
-            App.Helper.hideError.bind(this)();
-            e.preventDefault();
-            this.user = new Parse.User();
-            this.user.set({
-                username: this.$el.find("#signUp-form").find('.login').val(),
-                password: this.$el.find("#signUp-form").find('.password').val(),
-                email: this.$el.find("#signUp-form").find('.email').val()
-            });
-            this.user.signUp(null, {
-                success: function (){
-                    this.template = App.Helper.template('successSignUp-template');
-                    this.render();
-                }.bind(this),
-                error:   App.Helper.showError.bind(this)
-            });
-        },
-
-        login: function(){
-            this.cancel();
-            App.vent.trigger('login');
-        },
-
-        cancel: function (){
-            App.Helper.unlockScreen();
-            this.$el.remove();
         }
     });
 
@@ -317,11 +272,8 @@
         login: function(e) {
             e.preventDefault();
             App.Helper.hideError.bind(this)();
-
-            var login = this.$el.find("#login-form").find('.login').val();
-            var password = this.$el.find("#login-form").find('.password').val();
-
-            Parse.User.logIn(login, password, {
+            this.readData();
+            Parse.User.logIn(this.userName, this.password, {
                 success: function (){
                     App.vent.trigger('login');
                 }.bind(this),
@@ -329,11 +281,16 @@
             });
         },
 
+        readData: function(){
+            this.userName = this.$el.find("#login-form").find('.login').val();
+            this.password = this.$el.find("#login-form").find('.password').val();
+        },
+
         signUp: function() {
             this.clear();
             App.Helper.lockScreen();
             var signUp = new App.Views.SignUp ();
-            $(".content").append(signUp.render().el);
+            this.$el.append(signUp.render().el);
         },
 
         clear: function() {
@@ -343,11 +300,60 @@
 
         successLogin: function(){
             console.log('LOGIN');
-            App.appRouter.navigate("/todo/" + Parse.User.current().id, true);
-            this.$el.detach();
+            Parse.history.navigate("/todo/" + Parse.User.current().id, true);
         }
     });
 
+
+    //______________________signUp View_____________________
+
+    App.Views.SignUp = Parse.View.extend({
+        template: App.Helper.template('signUp-template'),
+        className: 'signUp-mode',
+
+        events: {
+            'submit': 'signUp',
+            'click .signup-cancel': 'cancel',
+            'click .btn-login': 'login'
+        },
+
+        render: function (){
+            this.$el.html(this.template());
+            return this;
+        },
+
+        signUp: function(e) {
+            App.Helper.hideError.bind(this)();
+            e.preventDefault();
+            this.setData();
+            this.user.signUp(null, {
+                success: function (){
+                    this.template = App.Helper.template('successSignUp-template');
+                    this.render();
+                }.bind(this),
+                error:   App.Helper.showError.bind(this)
+            });
+        },
+
+        setData: function(){
+            this.user = new Parse.User();
+            this.user.set({
+                username: this.$el.find("#signUp-form").find('.login').val(),
+                password: this.$el.find("#signUp-form").find('.password').val(),
+                email: this.$el.find("#signUp-form").find('.email').val()
+            });
+        },
+
+        login: function(){
+            this.cancel();
+            App.vent.trigger('login');
+        },
+
+        cancel: function (){
+            App.Helper.unlockScreen();
+            this.$el.remove();
+        }
+    });
 
 
     //______________________share View_____________________
@@ -416,13 +422,9 @@
 
         logOut: function(){
             Parse.User.logOut();
-            App.vent.trigger('logout');
-            App.appRouter.navigate("", true);
+            Parse.history.navigate("", true);
         }
     });
-
-
-
 
 
     //_______________ManageTodosView View_____________________
@@ -432,11 +434,8 @@
         el: "#manage-block",
 
         initialize: function () {
-            App.vent.on('logout', this.logout, this);
             this.collection = new App.Collections.TaskList();
         },
-
-
 
         render: function () {
 
@@ -445,14 +444,11 @@
             this.$el.append(new App.Views.TaskListView({collection:this.collection}).render().el);
             this.$el.append(new App.Views.LogOut().render().el);
             return this;
-        },
-
-        logout: function() {
-            this.$el.detach();
         }
     });
 
-    //________________Content Vieww_____________________
+
+    //________________Content View_____________________
 
     App.Views.ContentView = Parse.View.extend({
         template: App.Helper.template('app-template'),
@@ -464,9 +460,15 @@
         },
 
         open: function(viewName){
-            console.log(viewName);
+            this.close();
             var view = this.pageList[viewName].render();
             view.$el.appendTo(this.$el);
+        },
+
+        close: function (){
+            _.each(this.pageList, function(page) {
+                page.$el.detach();
+            }, this);
         }
     });
 
@@ -484,23 +486,21 @@
                 App.vent.trigger('login');
                 return;
             }
-            wrapper.open('index');
+            content.open('index');
         },
 
         todo: function () {
             if(!Parse.User.current()){
-                App.appRouter.navigate("", true);
+                Parse.history.navigate("", true);
                 return;
             }
-            wrapper.open('todo');
+            content.open('todo');
         }
     });
 
-    var wrapper = new App.Views.ContentView();
+    var content = new App.Views.ContentView();
+    new App.Router.AppRouter();
 
-
-    App.appRouter = new App.Router.AppRouter();
     Parse.history.start();
-
 
 })();
