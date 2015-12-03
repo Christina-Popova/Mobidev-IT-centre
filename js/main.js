@@ -73,28 +73,7 @@
 
         initialize: function() {
             App.vent.on('addNewTask', this.addTask, this);
-            App.vent.on('login', this.login, this);
             App.vent.on('allCompleted', this.allCompleted, this);
-        },
-
-        login:function (){
-            this.reset();
-            var query = this.createQuery();
-            query.find({
-                success: function(results) {
-                    _.each(results, function(value) {
-                        this.add(value);
-                    }, this);
-                }.bind(this)
-            });
-        },
-
-        createQuery: function () {
-            var user = new Parse.Query(App.Models.Task);
-            user.equalTo('user', Parse.User.current());
-            var share = new Parse.Query(App.Models.Task);
-            share.equalTo("share", Parse.User.current());
-            return Parse.Query.or(user, share);
         },
 
         allCompleted: function (flag){
@@ -133,7 +112,8 @@
             'click .delete': 'destroy',
             'click .save': 'save',
             'click .edit-cancel': 'cancel',
-            'click .share': 'share'
+            'click .share': 'share',
+            "keypress .item" : "updateOnEnter"
         },
 
         render: function() {
@@ -159,6 +139,7 @@
         edit: function() {
             this.template = App.Helper.template('edit-template');
             this.render();
+            this.$el.find('.item').focus();
         },
 
         save: function() {
@@ -175,12 +156,17 @@
             this.render();
         },
 
+        updateOnEnter: function(e) {
+            if (e.keyCode == 13) this.save();
+        },
+
         destroy: function() {
             this.model.destroy();
         },
 
         remove: function() {
             this.$el.remove();
+            App.vent.off('clearCompleted', this.clearCompleted, this);
         },
 
         share: function () {
@@ -190,6 +176,7 @@
         },
 
         clearCompleted:function () {
+            console.log('dafdsfdads');
             return this.model.get('isComplete') ? this.destroy() : false;
         }
     });
@@ -207,9 +194,30 @@
         },
 
         render: function() {
-            this.collection.each(this.addOne, this);
+            this.collection.reset();
+            this.getData();
             return this;
         },
+
+        getData:function (){
+            var query = this.createQuery();
+            query.find({
+                success: function(results) {
+                    _.each(results, function(value) {
+                        this.collection.add(value);
+                    }, this);
+                }.bind(this)
+            });
+        },
+
+        createQuery: function () {
+            var user = new Parse.Query(App.Models.Task);
+            user.equalTo('user', Parse.User.current());
+            var share = new Parse.Query(App.Models.Task);
+            share.equalTo("share", Parse.User.current());
+            return Parse.Query.or(user, share);
+        },
+
 
         filter: function (filter){
             this.$el.empty();
@@ -583,7 +591,6 @@
                 Parse.history.navigate("", true);
                 return;
             }
-            App.vent.trigger('login');
             this.contentView.open('todo');
         }
     });
