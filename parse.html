@@ -1,10 +1,10 @@
-<!doctype html>
+<!doctype>
+<html>
 <head>
     <meta charset="utf-8">
     <title>My Parse App</title>
     <meta name="description" content="My Parse App">
     <meta name="viewport" content="width=device-width">
-    <!--<link href='https://fonts.googleapis.com/css?family=Dancing+Script' rel='stylesheet' type='text/css'>-->
     <link href='https://fonts.googleapis.com/css?family=Marck+Script&subset=latin,cyrillic' rel='stylesheet' type='text/css'>
     <link media="all" rel="stylesheet" type="text/css" href="css/all.css" />
 
@@ -64,7 +64,7 @@
             <span><%= title %></span>
         </div>
         <div class="align-right">
-            <button class="share"><img src="css/share.png"></button>
+            <button class="share"><img src="css/img/share.png"></button>
             <button class="edit">Edit</button>
             <button class="delete">X</button>
         </div>
@@ -168,14 +168,10 @@
 
 
 
-
-
-
-<script type="text/javascript" src="js/jquery.js"></script>
-<script type="text/javascript" src="js/underscore.js"></script>
-<!--<script type="text/javascript" src="js/backbone.js"></script>-->
-<script type="text/javascript" src="js/parse.js"></script>
-<script type="text/javascript" src="js/main.js"></script>
+<script type="text/javascript" src="js/3p/jquery.js"></script>
+<script type="text/javascript" src="js/3p/underscore.js"></script>
+<script type="text/javascript" src="js/3p/parse.js"></script>
+<script type="text/javascript" data-main="js/app" src="js/3p/requirejs/require.js"></script>
 
 </body>
 
