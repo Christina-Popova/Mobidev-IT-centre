@@ -1,6 +1,26 @@
-define(['routers/app-router'], function(AppRouter) {
-    console.log('a');
-    Parse.initialize("kbGqvtthGHcJtxulUtMXwHvULR1ORorGCCci8i4O", "61EgD1NeVAKFuE8IZwe6Vd1cXTigNl1cExolTYbB");
-    new AppRouter;
-    Parse.history.start();
+require.config({
+    shim: {
+        jquery: {
+            exports: '$'
+        },
+        underscore: {
+            exports: '_'
+        },
+        parse: {
+            deps: [
+                'underscore',
+                'jquery'
+            ],
+            exports: 'Parse'
+        }
+    },
+    paths: {
+        jquery: '3p/jquery',
+        underscore: '3p/underscore',
+        parse: '3p/parse'
+    },
+    deps: ['app']
 });
+
+
+

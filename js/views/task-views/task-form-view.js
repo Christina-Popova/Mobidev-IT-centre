@@ -2,7 +2,6 @@ define(['views/abstract-view'], function (AbstractView) {
 
     var TaskFormView = AbstractView.extend({
 
-        //template: this.compileTemplate('form-template'),
         template: _.template($('#form-template').html()),
 
         events: {

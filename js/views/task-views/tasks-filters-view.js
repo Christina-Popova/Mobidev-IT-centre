@@ -2,7 +2,6 @@ define(['views/abstract-view'], function (AbstractView) {
 
     var FiltersView = AbstractView.extend({
 
-        //template: this.compileTemplate('filter-template'),
         template: _.template($('#filter-template').html()),
 
         id: 'filter',

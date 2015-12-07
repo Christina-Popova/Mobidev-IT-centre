@@ -7,7 +7,6 @@ define([
 
         tagName: "li",
         template: _.template($('#task-template').html()),
-        //template: this.compileTemplate('task-template'),
 
         initialize: function() {
             this.model.on('change', this.render, this);
@@ -47,7 +46,6 @@ define([
         },
 
         edit: function() {
-            //this.template = this.compileTemplate('edit-template');
             this.template = _.template($('#edit-template').html());
             this.render();
             this.$el.find('.item').focus();

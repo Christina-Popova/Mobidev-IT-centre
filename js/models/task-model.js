@@ -1,4 +1,4 @@
-define([], function () {
+define(['parse'], function (Parse) {
 
     var Task =  Parse.Object.extend("Task", {
         defaults: {

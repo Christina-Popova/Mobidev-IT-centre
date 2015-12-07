@@ -4,7 +4,6 @@ define([
 
     var ShareView = AbstractView.extend({
 
-        //template: this.compileTemplate('share-template'),
         template: _.template($('#share-template').html()),
         className: 'share-mode',
 
@@ -44,7 +43,6 @@ define([
             relation.add(user);
             this.model.set('isShare', true);
             this.model.save();
-            //this.template = this.compileTemplate('successShare-template');
             this.template = _.template($('#successShare-template').html()),
             this.$el.html(this.template({user: user.get('username')}));
         },

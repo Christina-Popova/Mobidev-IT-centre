@@ -2,7 +2,6 @@ define(['views/abstract-view'], function (AbstractView) {
 
     var ToolsView = AbstractView.extend({
 
-        //template: this.compileTemplate('tools-template'),
         template: _.template($('#tools-template').html()),
         id: 'tools',
 

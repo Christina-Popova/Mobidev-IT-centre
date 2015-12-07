@@ -1,6 +1,5 @@
 define([
-    'models/task-model',
-    "3p/parse"
+    'models/task-model'
 ], function (Task) {
 
     var TaskList = Parse.Collection.extend({

@@ -1,10 +1,6 @@
-define([], function () {
+define(['parse'], function (Parse) {
 
     var AbstractView = Parse.View.extend({
-
-        compileTemplate: function(id){
-            return _.template($('#' + id).html());
-        },
 
         lockScreen: function() {
             $("body").prepend("<div class='overlay'></div>");
