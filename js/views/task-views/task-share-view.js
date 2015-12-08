@@ -1,16 +1,26 @@
 define([
-    'views/abstract-view'
-], function (AbstractView) {
+    'views/abstract-view',
+    'text!templates/share-template.tpl',
+    'text!templates/success-share-template.tpl'
+], function (AbstractView, ShareTemplate, SuccessShareTemplate) {
 
     var ShareView = AbstractView.extend({
 
-        template: _.template($('#share-template').html()),
-        className: 'share-mode',
+        template: _.template(ShareTemplate),
+        el:  '#share-block',
 
         events: {
             'submit': 'submit',
             'click .share-cancel': 'cancel',
             'click .btn-continue': 'cancel'
+        },
+
+        initialize: function(){
+            Parse.Events.on('model:share', this.setModel, this);
+        },
+
+        setModel: function (model) {
+            this.model = model;
         },
 
         render: function () {
@@ -20,36 +30,50 @@ define([
 
         submit: function (e) {
             e.preventDefault();
-            this.hideError.bind(this);
+            this.hideError();
 
             var query = new Parse.Query(Parse.User);
             query.equalTo('email', this.$el.find('.email').val());
             query.first({
                 success: function (result) {
-                    return result ? this.successShare(result) : this.errorMessage();
+                    return result ? this.successShare(result) : this.errorMessage('User with this email does not exist!');
                 }.bind(this),
                 error: this.showError.bind(this)
             });
         },
 
-        errorMessage: function () {
+        errorMessage: function (mes) {
             var errors = {};
-            errors.message = 'User with this email does not exist!';
-            this.showError.bind(this)(this.model, errors);
+            errors.message = mes;
+            this.showError(this.model, errors);
         },
 
         successShare: function (user) {
+            this.user = user;
+            if(this.userCheck()){
+                return;
+            }
             var relation = this.model.relation("share");
             relation.add(user);
-            this.model.set('isShare', true);
-            this.model.save();
-            this.template = _.template($('#successShare-template').html()),
-            this.$el.html(this.template({user: user.get('username')}));
+            this.model.save('isShare', true);
+            this.viewSuccessTemplate();
+        },
+
+        userCheck: function(){
+            if(this.user.id === Parse.User.current().id){
+                this.errorMessage("You can't share task for youself!");
+                return true;
+            }
+        },
+
+        viewSuccessTemplate: function(){
+            this.template = _.template(SuccessShareTemplate);
+            this.$el.html(this.template({user: this.user.get('username')}));
         },
 
         cancel: function () {
-            this.unlockScreen();
-            this.$el.remove();
+            Parse.history.navigate("/todo/" + Parse.User.current().id, true);
+            this.template = _.template(ShareTemplate);
         }
     });
 

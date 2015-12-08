@@ -1,8 +1,9 @@
-define(['views/abstract-view'], function (AbstractView) {
+define([
+    'views/abstract-view', 'text!templates/filter-template.tpl'], function (AbstractView, FilterTemplate) {
 
     var FiltersView = AbstractView.extend({
 
-        template: _.template($('#filter-template').html()),
+        template: _.template(FilterTemplate),
 
         id: 'filter',
 

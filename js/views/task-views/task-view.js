@@ -1,12 +1,15 @@
 define([
     'views/abstract-view',
-    'views/task-views/task-share-view'
-], function (AbstractView, ShareView) {
+    'views/task-views/task-share-view',
+    'views/task-views/edit-view',
+    'text!templates/task-template.tpl'
+    //'text!templates/edit-template.tpl'
+], function (AbstractView, ShareView, EditView, TaskTemplate) {
 
     var TaskView = AbstractView.extend({
 
         tagName: "li",
-        template: _.template($('#task-template').html()),
+        template: _.template(TaskTemplate),
 
         initialize: function() {
             this.model.on('change', this.render, this);
@@ -18,11 +21,7 @@ define([
         events: {
             'click .status-toggle': 'toggleStatus',
             'click .edit': 'edit',
-            'click .delete': 'destroy',
-            'click .save': 'save',
-            'click .edit-cancel': 'cancel',
-            'click .share': 'share',
-            "keypress .item" : "updateOnEnter"
+            'click .delete': 'destroy'
         },
 
         render: function() {
@@ -46,28 +45,10 @@ define([
         },
 
         edit: function() {
-            this.template = _.template($('#edit-template').html());
-            this.render();
-            this.$el.find('.item').focus();
-        },
-
-        save: function() {
-            this.hideError.bind(this)();
-            var res = this.model.set({title: this.$el.find('input:text').val()}, {validate: true}, {silent:true});
-            if(res){
-                this.model.save();
-                this.cancel();
-            }
-        },
-
-        cancel: function() {
-            this.template = _.template($('#task-template').html());
-            //this.template = this.compileTemplate('task-template');
-            this.render();
-        },
-
-        updateOnEnter: function(e) {
-            if (e.keyCode == 13) this.save();
+            this.lockScreen();
+            var editView = new EditView({model: this.model});
+            console.log(this.el);
+            this.$el.append(editView.render().el);
         },
 
         destroy: function() {
@@ -77,12 +58,6 @@ define([
         remove: function() {
             this.$el.remove();
             Parse.Events.off('clearCompleted', this.clearCompleted, this);
-        },
-
-        share: function () {
-            this.lockScreen();
-            var shareView = new ShareView({model: this.model});
-            $(".content").append(shareView.render().el);
         },
 
         clearCompleted:function () {

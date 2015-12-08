@@ -17,10 +17,10 @@ require.config({
     paths: {
         jquery: '3p/jquery',
         underscore: '3p/underscore',
-        parse: '3p/parse'
+        parse: '3p/parse',
+        text: '3p/text'
     },
     deps: ['app']
 });
-
 
 

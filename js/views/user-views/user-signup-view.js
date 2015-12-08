@@ -1,13 +1,15 @@
 define([
-    'views/abstract-view'
-], function (AbstractView) {
+    'views/abstract-view',
+    'text!templates/signup-template.tpl',
+    'text!templates/success-signup-template.tpl'
+], function (AbstractView, SignUp, SuccessSignUpTemplate) {
 
-    var SignUp = AbstractView.extend({
+    var SignUpView = AbstractView.extend({
 
-        //template: this.compileTemplate('signUp-template'),
-        template: _.template($('#signUp-template').html()),
+        template: _.template(SignUp),
+        el: "#signup-block",
 
-        className: 'signUp-mode',
+        //className: 'signUp-mode',
 
         events: {
             'submit': 'signUp',
@@ -21,13 +23,12 @@ define([
         },
 
         signUp: function(e) {
-            this.hideError.bind(this)();
+            this.hideError();
             e.preventDefault();
             this.setData();
             this.user.signUp(null, {
                 success: function (){
-                    this.template = _.template($('#successSignUp-template').html());
-                    //this.template = this.compileTemplate('successSignUp-template');
+                    this.template = _.template(SuccessSignUpTemplate);
                     this.render();
                 }.bind(this),
                 error:   this.showError.bind(this)
@@ -49,10 +50,9 @@ define([
         },
 
         cancel: function (){
-            this.unlockScreen();
-            this.$el.remove();
+            Parse.history.navigate("", true);
         }
     });
 
-    return SignUp;
+    return SignUpView;
 });

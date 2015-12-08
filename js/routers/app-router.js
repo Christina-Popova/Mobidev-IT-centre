@@ -4,8 +4,10 @@ define([
 
     var AppRouter = Parse.Router.extend({
         routes: {
-            "": "index",
-            'todo/:id' : 'todo'
+            ""         : "index",
+            'signup'   : 'signup',
+            'todo/:id' : 'todo',
+            'share'    : 'share'
         },
 
         initialize: function(){
@@ -20,12 +22,20 @@ define([
             this.contentView.open('index');
         },
 
+        signup: function () {
+            this.contentView.open('signup');
+        },
+
         todo: function () {
             if(!Parse.User.current()){
                 Parse.history.navigate("", true);
                 return;
             }
             this.contentView.open('todo');
+        },
+
+        share: function(){
+            this.contentView.open('share');
         }
     });
 

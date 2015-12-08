@@ -1,25 +1,21 @@
-<!doctype>
+<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8">
     <title>My Parse App</title>
-    <meta name="description" content="My Parse App">
-    <meta name="viewport" content="width=device-width">
     <link href='https://fonts.googleapis.com/css?family=Marck+Script&subset=latin,cyrillic' rel='stylesheet' type='text/css'>
     <link media="all" rel="stylesheet" type="text/css" href="css/all.css" />
-
-
 </head>
-
 <body>
-
 
 <div class="container">
     <div class="wrapper">
         <div class="content">
             <h1>To do list</h1>
             <div id="login-block"></div>
+            <div id="signup-block"></div>
             <div id="manage-block"></div>
+            <div id="share-block"></div>
         </div>
 
         <div class="copyright">
@@ -29,143 +25,7 @@
     </div>
 </div>
 
-
-
-<!----------------Templates--------------->
-
-<script type="text/template" id="app-template">
-
-</script>
-
-<script type="text/template" id="filter-template">
-    <button class="selected" id="all">All</button>
-    <button id="completed">Completed</button>
-    <button id="active">Active</button>
-</script>
-
-<script type="text/template" id="tools-template">
-    <label><input class='all-complete' type="checkbox">Check all</label>
-    <button class="clear-completed">Clear completed</button>
-</script>
-
-<script type="text/template" id="form-template">
-    <form id="add-task">
-        <input type="text" required placeholder="New task" class="task">
-        <input type="submit" value="Add new task">
-    </form>
-    <div class="error"></div>
-</script>
-
-
-<script type="text/template" id="task-template">
-    <div class="block">
-        <div class="align-left">
-            <input class="status-toggle" type="checkbox" <%= isComplete ? 'checked="checked"' : ''%>>
-            <span><%= title %></span>
-        </div>
-        <div class="align-right">
-            <button class="share"><img src="css/img/share.png"></button>
-            <button class="edit">Edit</button>
-            <button class="delete">X</button>
-        </div>
-    </div>
-</script>
-
-
-<script type="text/template" id="edit-template">
-    <input class="status-toggle" type="checkbox" <%= isComplete ? 'checked="checked"' : ''%>>
-    <input type='text' class='item' value="<%= title %>" >
-    <button class="save">Save</button>
-    <button class="edit-cancel">Cancel</button>
-    <div class="error model-error"></div>
-</script>
-
-
-<script type="text/template" id="login-template">
-    <form id="login-form">
-        <div class="row">
-            <input type="text"  placeholder="Login" class="login">
-        </div>
-        <div class="row">
-            <input type="password"  placeholder="Password" class="password">
-        </div>
-        <div class="row">
-            <input type="submit" value="LogIn" class="btn-login btn-style">
-        </div>
-    </form>
-    <div class="row">
-        <button class="signUp btn-style">SignUp</button>
-    </div>
-    <div class="error"></div>
-</script>
-
-
-
-<script type="text/template" id="signUp-template">
-    <h3>Sign Up</h3>
-    <form id="signUp-form">
-        <div class="row">
-            <input type="text"  placeholder="Login" class="login">
-        </div>
-        <div class="row">
-            <input type="password"  placeholder="Password" class="password">
-        </div>
-        <div class="row">
-            <input type="email"  placeholder="Email" class="email">
-        </div>
-        <div class="row">
-            <input type="submit" value="SignUp" class="btn-signup btn-style">
-        </div>
-    </form>
-    <div class="row">
-        <button class="signup-cancel btn-style">Cancel</button>
-    </div>
-    <div class="error"></div>
-</script>
-
-
-<script type="text/template" id="successSignUp-template">
-    <p>Thank you! Registration was successful!</p>
-    <div class="row">
-        <button class="btn-login btn-style">LogIn</button>
-    </div>
-</script>
-
-
-<script type="text/template" id="logout-template">
-    <div id="logout-block">
-        <span>Signed in as <strong> <%= Parse.User.current().escape("username")%> </strong></span>
-        <button class="logOut">LogOut</button>
-    </div>
-</script>
-
-
-<script type="text/template" id="share-template">
-    <p>Please, input email user who will be share</p>
-    <form id="share-form">
-        <div class="row">
-            <input type="email"  placeholder="Email" class="email">
-        </div>
-        <div class="row">
-            <input type="submit" value="Share" class="btn-share btn-style">
-        </div>
-    </form>
-    <div class="row">
-        <button class="share-cancel btn-style">Cancel</button>
-    </div>
-    <div class="error"></div>
-</script>
-
-
-<script type="text/template" id="successShare-template">
-    <p>Thank you! Task was shared for user <b><%= user %></b> !</p>
-    <div class="row">
-        <button class="btn-continue btn-style">Ok</button>
-    </div>
-</script>
-
 <script type="text/javascript" data-main="js/main" src="js/3p/require.js"></script>
 
 </body>
-
 </html>

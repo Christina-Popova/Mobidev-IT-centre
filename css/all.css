@@ -4,12 +4,12 @@
 
 body{
     margin: 0;
-    /*font-family:'Dancing Script', cursive, 'Marck Script', cursive;*/
     font-family: 'Marck Script', cursive;
     font-size: 20px;
 }
+
 p{
-    padding:50px 0 30px;
+    padding:30px 0;
 }
 
 a {
@@ -23,7 +23,12 @@ form{
 
 ul {
     list-style: none;
+    padding: 20px;
+    margin: 0;
 }
+/*.content{*/
+    /*position: relative;*/
+/*}*/
 
 input, button{
     font-family: 'Marck Script', cursive;
@@ -36,13 +41,18 @@ input, button{
    padding: 50px;
 }
 
-.wrapper, .signUp-mode, .share-mode {
-   width: 600px;
+.wrapper, .edit-mode {
+   max-width: 500px;
    margin: 0 auto;
    padding: 30px 20px 20px 60px;
-   background-image: url("img/todo-bg.jpg");
+   background-image: url("../img/todo-bg.jpg");
    border: 1px solid lightgrey;
    box-shadow: 0 0 5px grey;
+}
+
+.edit-mode{
+    background-image: url("../img/edit-mode.jpg");
+    padding: 30px 30px 20px 70px;
 }
 
 .complete span{
@@ -55,15 +65,11 @@ input, button{
    font-size: 18px;
 }
 
-.model-error {
-    padding-left: 30px;
-}
-
-.signUp-mode, .share-mode {
-   position: fixed;
-   top:175px;
-   left: 50%;
-   margin-left: -250px;
+.edit-mode {
+   position: relative;
+   top:0;
+   left: 0;
+    margin: 0 auto;
    z-index: 3;
 }
 
@@ -74,16 +80,12 @@ input, button{
     opacity: 0.4;
 }
 
-
-.login, .password, .email,.btn-style{
+.login, .password, .email,.btn-style, .item{
     width: 220px;
-}
-.item {
-    width: 315px;
 }
 
 .task{
-   width: 375px;
+   width:70%;
 }
 
 .row{
@@ -109,32 +111,31 @@ input, button{
     line-height: 30px;
 
 }
+/*#tasks-list li{*/
+    /*position: relative;*/
+/*}*/
+
 #tasks-list span{
     position: relative;
 }
 
-.block:after {
+.clear-fix:after {
     content: " ";
     display: table;
     clear: both;
 }
 
-#tasks-list .align-left, .align-right{
+#tasks-list .align-left{
     float: left;
+    width: 80%
 }
-.align-left {
-    width: 315px
-}
-.share{
-    vertical-align: middle;
-}
-.share img {
-    margin: 1px 2px 2px 2px;
-    display: table-cell;
+
+.align-right {
+    float: right;
 }
 
 #tools, #filter {
-    margin: 10px 25px 10px 40px;
+    margin: 10px 20px;
     padding: 10px 0;
 }
 
@@ -143,23 +144,28 @@ input, button{
 }
 
 #tools button{
-    margin-left: 200px;
+    float: right;
 }
 
 #filter{
     border-top: 1px solid grey;
+    text-align: center;
 }
 #filter button {
     width: 100px;
-    margin-left: 5px;
 }
 
 #filter button + button{
-    margin-left: 55px;
+    margin-left: 15px;
 }
 
 .selected {
     font-weight: bold;
+}
+
+.edit-block {
+    margin: 15px 0;
+    text-align: center;
 }
 
 
@@ -186,7 +192,7 @@ input, button{
 
 .shared span::after {
     content: "";
-    background: url("img/share_icon.png");
+    background: url("../img/share_icon.png");
     width: 22px;
     height: 22px;
     position: absolute;

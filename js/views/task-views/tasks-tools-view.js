@@ -1,8 +1,8 @@
-define(['views/abstract-view'], function (AbstractView) {
+define(['views/abstract-view', 'text!templates/tools-template.tpl'], function (AbstractView, ToolsTemplate) {
 
     var ToolsView = AbstractView.extend({
 
-        template: _.template($('#tools-template').html()),
+        template: _.template(ToolsTemplate),
         id: 'tools',
 
         events: {

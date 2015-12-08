@@ -1,9 +1,8 @@
-define(['views/abstract-view'], function (AbstractView) {
+define(['views/abstract-view', 'text!templates/logout-template.tpl'], function (AbstractView, LogOutTemplate) {
 
     var LogOut = AbstractView.extend({
 
-        //template: this.compileTemplate('logout-template'),
-        template: _.template($('#logout-template').html()),
+        template: _.template(LogOutTemplate),
 
         events: {
             'click .logOut': 'logOut'

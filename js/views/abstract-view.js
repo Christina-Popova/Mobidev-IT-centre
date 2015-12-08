@@ -5,12 +5,8 @@ define(['parse'], function (Parse) {
         lockScreen: function() {
             $("body").prepend("<div class='overlay'></div>");
             $(".overlay").css({
-                "position": "absolute",
                 "width": $(document).width(),
-                "height": $(document).height(),
-                "z-index": 2,
-                "background-color": "grey",
-                "opacity": 0.4
+                "height": $(document).height()
             }).hide().fadeIn();
         },
 

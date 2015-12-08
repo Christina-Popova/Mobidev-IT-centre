@@ -1,8 +1,11 @@
-define(['views/abstract-view'], function (AbstractView) {
+define([
+    'views/abstract-view',
+    'text!templates/form-template.tpl'
+], function (AbstractView, FormTemplate) {
 
     var TaskFormView = AbstractView.extend({
 
-        template: _.template($('#form-template').html()),
+        template: _.template(FormTemplate),
 
         events: {
             'submit': 'submit',
@@ -16,7 +19,7 @@ define(['views/abstract-view'], function (AbstractView) {
 
         submit: function(e) {
             e.preventDefault();
-            this.hideError.bind(this)();
+            this.hideError();
             this.readData();
             if(!this.isDataValid()){
                 this.errorMessage(this.task);
@@ -37,7 +40,7 @@ define(['views/abstract-view'], function (AbstractView) {
         errorMessage: function(task){
             var errors = {};
             errors.message = "Title can't be empty";
-            this.showError.bind(this)(task, errors);
+            this.showError(task, errors);
         },
 
         clear: function (){
@@ -45,7 +48,7 @@ define(['views/abstract-view'], function (AbstractView) {
         },
 
         blur: function (){
-            this.hideError.bind(this)();
+            this.hideError();
         }
     });
 

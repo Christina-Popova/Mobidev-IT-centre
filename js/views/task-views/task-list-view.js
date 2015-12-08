@@ -15,9 +15,14 @@ define([
         },
 
         render: function() {
-            this.collection.reset();
+            this.reset();
             this.getData();
             return this;
+        },
+
+        reset: function(){
+            this.$el.empty();
+            this.collection.reset();
         },
 
         getData:function (){
