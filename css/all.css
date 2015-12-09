@@ -21,10 +21,14 @@ form{
     padding: 10px 0;
 }
 
-ul {
+ul{
     list-style: none;
     padding: 0;
     margin: 0;
+}
+
+li {
+    word-wrap: break-word;
 }
 
 input, button{
@@ -77,8 +81,12 @@ input, button{
     width: 220px;
 }
 
-.task,.align-left {
-   width:65%;
+.task{
+   width:50%;
+}
+
+.align-left {
+    width:65%;
 }
 
 .row{
@@ -155,26 +163,27 @@ input, button{
     font-weight: bold;
 }
 
-.edit-block {
-    margin: 15px 0;
+.btn-block {
+    margin: 10px 0;
     text-align: center;
+}
+.btn-block button,.btn-block input {
+    width: 62px;
 }
 
 
 #tasks-list .edit,
-#tasks-list .delete,
-#tasks-list .share {
+#tasks-list .delete{
     visibility:hidden;
 }
 
 #tasks-list li:hover .edit,
-#tasks-list li:hover .delete,
-#tasks-list li:hover .share{
+#tasks-list li:hover .delete{
     visibility:visible;
 }
 
-#tasks-list li.complete:hover .edit,
-#tasks-list li.complete:hover .share{
+#tasks-list li.editing .edit,
+#tasks-list li.editing .delete{
     visibility:hidden;
 }
 
@@ -192,5 +201,4 @@ input, button{
     right: -35px;
     top: 2px;
 }
-
 

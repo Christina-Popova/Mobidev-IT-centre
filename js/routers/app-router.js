@@ -1,6 +1,7 @@
 define([
-    'views/app-view'
-], function (AppView) {
+    'views/app-view',
+    'app'
+], function (AppView, App) {
 
     var AppRouter = Parse.Router.extend({
         routes: {

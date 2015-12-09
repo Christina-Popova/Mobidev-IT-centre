@@ -1,10 +1,8 @@
 define([
     'views/abstract-view',
-    'views/task-views/task-share-view',
     'views/task-views/edit-view',
     'text!templates/task-template.tpl'
-    //'text!templates/edit-template.tpl'
-], function (AbstractView, ShareView, EditView, TaskTemplate) {
+], function (AbstractView, EditView, TaskTemplate) {
 
     var TaskView = AbstractView.extend({
 
@@ -46,8 +44,8 @@ define([
 
         edit: function() {
             this.lockScreen();
+            this.$el.addClass('editing');
             var editView = new EditView({model: this.model});
-            console.log(this.el);
             this.$el.append(editView.render().el);
         },
 
