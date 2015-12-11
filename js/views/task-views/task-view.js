@@ -1,12 +1,16 @@
 define([
     'views/abstract-view',
     'views/task-views/edit-view',
-    'text!templates/task-template.tpl'
-], function (AbstractView, EditView, TaskTemplate) {
+    'text!templates/task-template.tpl',
+    'jquery',
+    'hammerjs', 'jqueryhammer'
+
+], function (AbstractView, EditView, TaskTemplate, $) {
 
     var TaskView = AbstractView.extend({
 
         tagName: "li",
+        className: 'task-item',
         template: _.template(TaskTemplate),
 
         initialize: function() {
@@ -14,12 +18,14 @@ define([
             this.model.on('destroy', this.remove, this);
             this.model.on('error', this.showError, this);
             Parse.Events.on('clearCompleted', this.clearCompleted, this);
+            this.$el.on( 'webkitTransitionEnd otransitionend oTransitionEnd msTransitionEnd transitionend', this.destroy.bind(this));
+            this.$el.hammer({threshold:50, velocity:0.5});
         },
 
         events: {
             'click .status-toggle': 'toggleStatus',
-            'click .edit': 'edit',
-            'click .delete': 'destroy'
+            'click span': 'edit',
+            'swiperight': 'animate'
         },
 
         render: function() {
@@ -44,12 +50,17 @@ define([
 
         edit: function() {
             this.lockScreen();
-            this.$el.addClass('editing');
             var editView = new EditView({model: this.model});
-            this.$el.append(editView.render().el);
+            this.$el.after(editView.render().el);
         },
 
-        destroy: function() {
+        animate: function() {
+            console.log('swiperight')
+            this.$el.css({height:0, left: this.$el.width()});
+        },
+
+        destroy:function() {
+            console.log('destroy');
             this.model.destroy();
         },
 
@@ -59,7 +70,7 @@ define([
         },
 
         clearCompleted:function () {
-            return this.model.get('isComplete') ? this.destroy() : false;
+            return this.model.get('isComplete') ? this.animate() : false;
         }
     });
 

@@ -20,7 +20,7 @@ define(['views/abstract-view', 'text!templates/tools-template.tpl'], function (A
         },
 
         clearCompleted: function(){
-            Parse.Events.trigger('clearCompleted')
+            Parse.Events.trigger('clearCompleted');
         }
     });
 

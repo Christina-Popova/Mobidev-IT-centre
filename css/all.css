@@ -5,7 +5,9 @@
 body{
     margin: 0;
     font-family: 'Marck Script', cursive;
-    font-size: 20px;
+    font-size: 22px;
+    box-sizing: content-box;
+    height: 100vh;
 }
 
 p{
@@ -27,7 +29,43 @@ ul{
     margin: 0;
 }
 
-li {
+.wrapper {
+    min-height: 100%;
+    position: relative;
+    overflow: hidden;
+}
+
+/*.footer {*/
+    /*font-size: 12px;*/
+    /*position: absolute;*/
+    /*margin: 20px;*/
+    /*width: 100%;*/
+    /*bottom: 0;*/
+    /*overflow: hidden;*/
+/*}*/
+
+.content {
+    padding-bottom: 40px;
+}
+
+
+.task-item span {
+    word-wrap: break-word;
+    vertical-align: middle;
+}
+
+.task-item {
+    height: 30px;
+    left: 0;
+    top:0;
+    position: relative;
+    -webkit-transition: all 1s ease-out 0s;
+    -moz-transition: all 1s ease-out 0s;
+    -o-transition: all 1s ease-out 0s;
+    transition: all 1s ease-out 0s;
+}
+
+.task-item span {
     word-wrap: break-word;
 }
 
@@ -36,38 +74,31 @@ input, button{
     font-size: 18px;
     padding-left: 5px;
 }
-
-.container{
-   box-sizing: content-box;
-   padding: 20px 5px;
-}
-
 .wrapper, .edit-mode {
-   max-width: 500px;
-   margin: 0 auto;
-   padding: 30px 20px 20px 60px;
-   background-image: url("../img/todo-bg.jpg");
-   border: 1px solid lightgrey;
-   box-shadow: 0 0 5px grey;
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 30px 20px 20px 60px;
+    background-image: url("../img/todo-bg.jpg");
+    border: 1px solid lightgrey;
+    box-shadow: 0 0 5px grey;
 }
 
 .complete span{
-   text-decoration: line-through;
+    text-decoration: line-through;
 }
 
 .error {
-   color: red;
-   height: 16px;
-   font-size: 18px;
+    color: red;
+    height: 16px;
+    font-size: 18px;
+    visibility: hidden;
 }
 
 .edit-mode {
-   position: absolute;
-   bottom:30%;
-   left: 0;
-    margin-left: -60px;
-    margin-bottom: -50px;
-   z-index: 3;
+    position: absolute;
+    bottom:30%;
+    left: 0;
+    z-index: 3;
 }
 
 .overlay {
@@ -81,43 +112,20 @@ input, button{
     width: 220px;
 }
 
+
+#add-task{
+  font-size: 0;
+}
 .task{
-   width:50%;
+    width:70%;
+    font-size: 22px;
 }
-
-.align-left {
-    width:65%;
+#add-task input[type=submit] {
+    width:30%;
+    font-size: 22px;
 }
-
 .row{
-   margin-bottom: 15px;
-}
-
-.copyright {
-    font-size: 12px;
-    margin-top: 50px;
-    text-align: center;
-    overflow: hidden;
-}
-
-.copyright span{
-    float: left;
-}
-
-.copyright span+span{
-    float: right;
-}
-
-#tasks-list li{
-    line-height: 30px;
-
-}
-#tasks-list li{
-    position: relative;
-}
-
-#tasks-list span{
-    position: relative;
+    margin-bottom: 15px;
 }
 
 .clear-fix:after {
@@ -126,17 +134,9 @@ input, button{
     clear: both;
 }
 
-#tasks-list .align-left{
-    float: left;
-}
-
-.align-right {
-    float: right;
-}
-
-#tools, #filter {
+#tools{
     margin: 10px 0;
-    padding: 10px 0;
+    padding: 5px 0;
 }
 
 #tools{
@@ -148,19 +148,15 @@ input, button{
 }
 
 #filter{
-    border-top: 1px solid grey;
-    text-align: center;
+    font-size: 0;
 }
 #filter button {
-    width: 70px;
-}
-
-#filter button + button{
-    margin-left: 15px;
+    width: 33.3%;
+    font-size: 22px;
 }
 
 .selected {
-    font-weight: bold;
+    background-color: darkgrey;
 }
 
 .btn-block {
@@ -171,25 +167,15 @@ input, button{
     width: 62px;
 }
 
-
-#tasks-list .edit,
-#tasks-list .delete{
-    visibility:hidden;
-}
-
-#tasks-list li:hover .edit,
-#tasks-list li:hover .delete{
-    visibility:visible;
-}
-
-#tasks-list li.editing .edit,
-#tasks-list li.editing .delete{
-    visibility:hidden;
-}
-
 #logout-block{
-    text-align: right;
-    margin: 20px 0 0;
+    margin: 0 0 30px 0;
+}
+#logout-block .align-left{
+    float: left;
+}
+
+#logout-block .align-right{
+    float: right;
 }
 
 .shared span::after {
@@ -202,3 +188,18 @@ input, button{
     top: 2px;
 }
 
+input[type='checkbox']{
+    width: 25px;
+    height: 25px;
+    vertical-align: middle;
+}
+
+.form-block{
+    height: 0;
+    bottom:0;
+    position: fixed;
+    -webkit-transition: all 1s ease-out 0s;
+    -moz-transition: all 1s ease-out 0s;
+    -o-transition: all 1s ease-out 0s;
+    transition: all 1s ease-out 0s;
+}

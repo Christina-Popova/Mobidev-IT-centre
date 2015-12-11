@@ -6,6 +6,7 @@ define([
     var TaskFormView = AbstractView.extend({
 
         template: _.template(FormTemplate),
+        className: 'form-block',
 
         events: {
             'submit': 'submit',

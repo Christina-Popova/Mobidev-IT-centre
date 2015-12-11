@@ -1,25 +1,29 @@
 define([
     'views/abstract-view',
     'views/task-views/edit-view',
-    'text!templates/task-template.tpl'
-], function (AbstractView, EditView, TaskTemplate) {
+    'text!templates/task-template.tpl',
+    'jquery',
+    'hammerjs', 'jqueryhammer'
+
+], function (AbstractView, EditView, TaskTemplate, $) {
 
     var TaskView = AbstractView.extend({
 
         tagName: "li",
+        className: 'task-item',
         template: _.template(TaskTemplate),
 
         initialize: function() {
             this.model.on('change', this.render, this);
             this.model.on('destroy', this.remove, this);
             this.model.on('error', this.showError, this);
-            Parse.Events.on('clearCompleted', this.clearCompleted, this);
+            this.$el.hammer({threshold:50, velocity:0.5});
         },
 
         events: {
             'click .status-toggle': 'toggleStatus',
-            'click .edit': 'edit',
-            'click .delete': 'destroy'
+            'click span': 'edit',
+            'swiperight': 'destroy',
         },
 
         render: function() {
@@ -44,14 +48,22 @@ define([
 
         edit: function() {
             this.lockScreen();
-            this.$el.addClass('editing');
+            //this.$el.addClass('editing');
             var editView = new EditView({model: this.model});
             this.$el.append(editView.render().el);
         },
 
         destroy: function() {
-            this.model.destroy();
+
+            var endTransition = function(){
+                this.model.destroy();
+            };
+            this.$el.css({height:0, left: $(".wrapper").outerWidth()});
+            this.el.addEventListener( 'webkitTransitionEnd', endTransition.bind(this) , false);
+            this.el.addEventListener( 'transitionend',  endTransition.bind(this), false);
+            this.el.addEventListener( 'OTransitionEnd', endTransition.bind(this), false);
         },
+
 
         remove: function() {
             this.$el.remove();

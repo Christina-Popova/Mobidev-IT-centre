@@ -26,8 +26,32 @@ ul{
     padding: 0;
     margin: 0;
 }
+.wrapper {
+    position: relative;
+    overflow: hidden;
+}
 
-li {
+#tasks-list{
+
+}
+
+.task-item span {
+    word-wrap: break-word;
+    vertical-align: middle;
+}
+
+.task-item {
+    height: 30px;
+    left: 0;
+    top:0;
+    position: relative;
+    -webkit-transition: all 0.5s ease-out 0s;
+    -moz-transition: all 0.5s ease-out 0s;
+    -o-transition: all 0.5s ease-out 0s;
+    transition: all 0.5s ease-out 0s;
+}
+
+.task-item span {
     word-wrap: break-word;
 }
 
@@ -39,7 +63,6 @@ input, button{
 
 .container{
    box-sizing: content-box;
-   padding: 20px 5px;
 }
 
 .wrapper, .edit-mode {
@@ -59,6 +82,7 @@ input, button{
    color: red;
    height: 16px;
    font-size: 18px;
+    visibility: hidden;
 }
 
 .edit-mode {
@@ -82,11 +106,7 @@ input, button{
 }
 
 .task{
-   width:50%;
-}
-
-.align-left {
-    width:65%;
+   width:70%;
 }
 
 .row{
@@ -101,37 +121,13 @@ input, button{
 }
 
 .copyright span{
-    float: left;
-}
-
-.copyright span+span{
     float: right;
-}
-
-#tasks-list li{
-    line-height: 30px;
-
-}
-#tasks-list li{
-    position: relative;
-}
-
-#tasks-list span{
-    position: relative;
 }
 
 .clear-fix:after {
     content: " ";
     display: table;
     clear: both;
-}
-
-#tasks-list .align-left{
-    float: left;
-}
-
-.align-right {
-    float: right;
 }
 
 #tools, #filter {
@@ -171,22 +167,6 @@ input, button{
     width: 62px;
 }
 
-
-#tasks-list .edit,
-#tasks-list .delete{
-    visibility:hidden;
-}
-
-#tasks-list li:hover .edit,
-#tasks-list li:hover .delete{
-    visibility:visible;
-}
-
-#tasks-list li.editing .edit,
-#tasks-list li.editing .delete{
-    visibility:hidden;
-}
-
 #logout-block{
     text-align: right;
     margin: 20px 0 0;
@@ -202,3 +182,8 @@ input, button{
     top: 2px;
 }
 
+input[type='checkbox']{
+    width: 25px;
+    height: 25px;
+    vertical-align: middle;
+}

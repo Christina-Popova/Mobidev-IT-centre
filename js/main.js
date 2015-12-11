@@ -3,9 +3,11 @@ require.config({
         jquery: {
             exports: '$'
         },
+
         underscore: {
             exports: '_'
         },
+
         parse: {
             deps: [
                 'underscore',
@@ -18,7 +20,9 @@ require.config({
         jquery: '3p/jquery',
         underscore: '3p/underscore',
         parse: '3p/parse',
-        text: '3p/text'
+        text: '3p/text',
+        hammerjs: '3p/hammer',
+        jqueryhammer:'3p/jquery.hammer'
     }
 });
 
